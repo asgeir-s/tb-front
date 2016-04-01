@@ -6,23 +6,34 @@ import { Handler } from "./handler"
 import { Context } from "./typings/aws-lambda"
 import { User } from "./typings/user"
 import { Response } from "./typings/response"
-
+import { JWT } from "./jwt"
 
 
 test("Handler:", (ot) => {
-  ot.plan(2)
+  const JWT_SECRET = "secret33"
+  const AUTH0_CLIENT_ID = "truman.net"
+
+  ot.plan(7)
 
   function testAction(inject: any, event: any, context: Context, user?: User): Promise<Response> {
     return Promise.resolve({
       "GRID": "some-grid-123",
-      "statusCode": 403,
-      "data": "Could not authenticate. Please, include the GRID when contacting support.",
-      "success": false
+      "statusCode": 200,
+      "data": {
+        "user": user ? user.email : ""
+      },
+      "success": true
     })
   }
 
-  ot.test("- should be able to handle unvalide event", (t) => {
-    t.plan(3)
+  function testActionThrow(inject: any, event: any, context: Context, user?: User): Promise<Response> {
+    return new Promise<Response>((resolve, reject) => {
+      throw new Error("test error")
+    })
+  }
+
+  ot.test("- for public endpint; should reject invalide event event", (t) => {
+    t.plan(4)
 
     Handler.handle(testAction,
       {
@@ -38,155 +49,187 @@ test("Handler:", (ot) => {
       , {}, {}, ({
         awsRequestId: "test-grid",
         done: (err: any, res: any) => {
+          t.equal(res, null)
           t.equal(err.success, false, "should not be succesfull")
-          t.equal(err.statusCode, 400, "should not be succesfull")
+          t.equal(err.statusCode, 400, "return 'bad request' statusCode")
           t.equal(err.GRID, "test-grid", "should not be succesfull")
         }
-      } as any))
+      } as any), true)
   })
 
-  ot.test("- should be able to handle unvalide schema", (t) => {
-    t.plan(3)
+  ot.test("- for public endpint; should reject when unvalide schema", (t) => {
+    t.plan(4)
 
     Handler.handle(testAction,
       {
-        "tile": "Example Schema",
-        "typ": "object",
-        "prperties": {
+        "22": "Example Schema",
+        "type": "O33",
+        "pres": {
           "nme": {
             "tye": "string"
           }
         },
-        "requid": ["name"]
+        "quid": "name}"
       }
       , {}, {}, ({
         awsRequestId: "test-grid",
         done: (err: any, res: any) => {
+          t.equal(res, null)
           t.equal(err.success, false, "should not be succesfull")
-          t.equal(err.statusCode, 500, "should not be succesfull")
-          t.equal(err.GRID, "test-grid", "should not be succesfull")
+          t.equal(err.statusCode, 400, "return 'bad request' statusCode")
+          t.equal(err.GRID, "test-grid", "should return the GRID that is returned when testAction does not run")
         }
-      } as any))
+      } as any), true)
   })
+
+  ot.test("- for public endpint; should run succesfull when all is OK", (t) => {
+    t.plan(4)
+
+    Handler.handle(testAction,
+      {
+        "title": "Example Schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["name"]
+      }
+      , {}, { "name": "Asgeir" }, ({
+        awsRequestId: "test-grid",
+        done: (err: any, res: any) => {
+          t.equal(err, null)
+          t.equal(res.success, true, "should be succesfull")
+          t.equal(res.statusCode, 200, "should return success statusCode")
+          t.equal(res.GRID, "some-grid-123", "should returne GRID from testAction")
+        }
+      } as any), true)
+  })
+
+  ot.test("- for not public endpint; should not authenticate with fake JWT", (t) => {
+    t.plan(4)
+
+    Handler.handle(testAction,
+      {
+        "title": "Example Schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "jwt": {
+            "type": "string"
+          }
+        },
+        "required": ["jwt", "name"]
+      }
+      , {
+        userFromJwt: _.curry(JWT.getUser)(JWT_SECRET, AUTH0_CLIENT_ID)
+      }, {
+        "name": "Asgeir",
+        "jwt": "fake"
+      }, ({
+        awsRequestId: "test-grid",
+        done: (err: any, res: any) => {
+          t.equal(res, null)
+          t.equal(err.success, false, "should not be succesfull")
+          t.equal(err.statusCode, 403, "should return unautorized statusCode")
+          t.equal(err.GRID, "test-grid", "should return the GRID that is returned when testAction does not run")
+        }
+      } as any), false)
+  })
+
+  ot.test("- for not public endpint; should not authenticate with expired JWT", (t) => {
+    t.plan(4)
+
+    Handler.handle(testAction,
+      {
+        "title": "Example Schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "jwt": {
+            "type": "string"
+          }
+        },
+        "required": ["jwt", "name"]
+      }
+      , {
+        userFromJwt: _.curry(JWT.getUser)(JWT_SECRET, AUTH0_CLIENT_ID)
+      }, {
+        "name": "Asgeir",
+        "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3RAZW1zaWwuY29tIiwidXNlcl9pZCI6IjEyMyIsImFwcF9tZXRhZGF0YSI6eyJzdHJlYW0tMTQ1NDI5MjE4MDI5MCI6ImVlMWNjMTRiLTNhZDYtNDg2OC05MjllLTYzNjVkMTcxN2U5YSIsInN0cmVhbS0xNDU0NzAzNjE3ODc2IjoiNTY4NDNiYTMtMDU4MS00YWJkLWJlMDUtNzZhZTM4MjA3Njg3In0sImlzcyI6InRyYWRlcnNiaXQuY29tIiwic3ViIjoidGVzdCIsImF1ZCI6InRydW1hbi5uZXQiLCJleHAiOjEzNTk2OTQ3NTgsImlhdCI6MTQ1NDI5MjE4MH0.5yao1BEhVxj6sWfoaOPFH92rn1WQquXZe9n2egLaOyE"
+      }, ({
+        awsRequestId: "test-grid",
+        done: (err: any, res: any) => {
+          t.equal(res, null)
+          t.equal(err.success, false, "should not be succesfull")
+          t.equal(err.statusCode, 403, "should return unautorized statusCode")
+          t.equal(err.GRID, "test-grid", "should return the GRID that is returned when testAction does not run")
+        }
+      } as any), false)
+  })
+
+  ot.test("- for public endpint; should return internal server error when the action throws an error", (t) => {
+    t.plan(4)
+
+    Handler.handle(testActionThrow,
+      {
+        "title": "Example Schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["name"]
+      }
+      , {}, { "name": "Asgeir" }, ({
+        awsRequestId: "test-grid",
+        done: (err: any, res: any) => {
+          t.equal(res, null)
+          t.equal(err.success, false, "should not be succesfull")
+          t.equal(err.statusCode, 500, "should return 'internal server error' statusCode")
+          t.equal(err.GRID, "test-grid", "should return the GRID that is returned when testAction does not run")
+        }
+      } as any), true)
+  })
+
+  ot.test("- for not public endpint; should authenticate with right JWT", (t) => {
+    t.plan(5)
+
+    Handler.handle(testAction,
+      {
+        "title": "Example Schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "jwt": {
+            "type": "string"
+          }
+        },
+        "required": ["jwt", "name"]
+      }
+      , {
+        userFromJwt: _.curry(JWT.getUser)(JWT_SECRET, AUTH0_CLIENT_ID)
+      }, {
+        "name": "Asgeir",
+        "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3RAZW1zaWwuY29tIiwidXNlcl9pZCI6IjEyMyIsImFwcF9tZXRhZGF0YSI6eyJzdHJlYW0tMTQ1NDI5MjE4MDI5MCI6ImVlMWNjMTRiLTNhZDYtNDg2OC05MjllLTYzNjVkMTcxN2U5YSIsInN0cmVhbS0xNDU0NzAzNjE3ODc2IjoiNTY4NDNiYTMtMDU4MS00YWJkLWJlMDUtNzZhZTM4MjA3Njg3In0sImlzcyI6InRyYWRlcnNiaXQuY29tIiwic3ViIjoidGVzdCIsImF1ZCI6InRydW1hbi5uZXQiLCJleHAiOjM0NTk2OTQ3NTgsImlhdCI6MTQ1NDI5MjE4MH0.D98TWRJp7l4yZ5_ovaNWN8xSnlBbwdEw5g6IXo7EH6c"
+      }, ({
+        awsRequestId: "test-grid",
+        done: (err: any, res: any) => {
+          t.equal(err, null)
+          t.equal(res.success, true, "should be succesfull")
+          t.equal(res.statusCode, 200, "should get back success statusCode")
+          t.equal(res.GRID, "some-grid-123", "should get back the GRID from the testAction")
+          t.equal(res.data.user, "test@emsil.com", "should get the user correctly")
+        }
+      } as any), false)
+  })
+
 })
-
-/** 
-import * as R from 'ramda'
-import * as chai from 'chai'
-
-import { Executor } from './executor'
-import { TestData, Mock } from './test-util'
-
-const expect = chai.expect;
-const executor = R.curry(Executor.run)(Mock.action, Mock.eventSchema, 'fake-GRID')
-
-describe('get-apikey', function() {
-  this.timeout(6000);
-
-  describe('event with valide JWT', () => {
-    it('should return success: mock', (done) => {
-      executor({
-        "jwt": TestData.valideJwt,
-        "test": "data"
-      }, (error: any, success: any) => {
-        expect(error).to.equal(null)
-        expect(success).to.equal('mock')
-        done()
-      })
-    })
-  })
-
-  describe('event with invalide JWT', () => {
-    it('should return an error', (done) => {
-      executor({
-        "jwt": TestData.invalideJwt,
-        "test": "data"
-      }, (err: any, succ: any) => {
-        expect(succ).to.equal(null)
-        expect(JSON.parse(err).message).to.equal('Could not authenticate. Pleas, include the request id when contacting support.')
-        done()
-      })
-    })
-  })
-
-  describe('event with expired JWT', () => {
-    it('should return an error', (done) => {
-      executor({
-        "jwt": TestData.expiredJWT,
-        "test": "data"
-      }, (err: any, succ: any) => {
-        expect(succ).to.equal(null)
-        expect(JSON.parse(err).message).to.equal('Could not authenticate. Pleas, include the request id when contacting support.')
-        done()
-      })
-    })
-  })
-
-  describe('event with valide JWT, but invalide json format', () => {
-    it('should return an error', (done) => {
-      executor({
-        "jwt": TestData.expiredJWT,
-        "test": "data",
-        "www": 22
-      }, (err: any, succ: any) => {
-        expect(succ).to.equal(null)
-        expect(JSON.parse(err).message).to.equal('Invalide json format.')
-        done()
-      })
-    })
-  })
-
-  describe('action that throws ReturnToUserError', () => {
-    it('should return the error to the user', (done) => {
-      Executor.run(Mock.actionThrowingReturnToUserError, Mock.eventSchema, 'fake-GRID', {
-        "jwt": TestData.valideJwt,
-        "test": "data"
-      }, (err: any, succ: any) => {
-        expect(succ).to.equal(null)
-        expect(JSON.parse(err).message).to.contain('ReturnToUserError-mock-error')
-        done()
-      })
-    })
-  })
-
-  describe('action that throws unknown error', () => {
-    it('should return a standard error to the user', (done) => {
-      Executor.run(Mock.actionThrowingReturnToUserError, Mock.eventSchema, 'fake-GRID', {
-        "jwt": TestData.valideJwt,
-        "test": "data"
-      }, (err: any, succ: any) => {
-        expect(succ).to.equal(null)
-        expect(JSON.parse(err).message).to.equal('Unknown error. Pleas, include the request id when contacting support.')
-        done()
-      })
-    })
-  })
-
-  describe('action that rejects with boolean, true,', () => {
-    it('should return a standard error to the user', (done) => {
-      Executor.run(Mock.actionRejectWithBooll, Mock.eventSchema, 'fake-GRID', {
-        "jwt": TestData.valideJwt,
-        "test": "data"
-      }, (err: any, succ: any) => {
-        expect(succ).to.equal(null)
-        expect(JSON.parse(err).message).to.equal('Unknown error. Pleas, include the request id when contacting support.')
-        done()
-      })
-    })
-  })
-
-  describe('action that rejects with unknown error', () => {
-    it('should return a standard error to the user', (done) => {
-      Executor.run(Mock.actionRejectWithError, Mock.eventSchema, 'fake-GRID', {
-        "jwt": TestData.valideJwt,
-        "test": "data"
-      }, (err: any, succ: any) => {
-        expect(succ).to.equal(null)
-        expect(JSON.parse(err).message).to.equal('Unknown error. Pleas, include the request id when contacting support.')
-        done()
-      })
-    })
-  })
-
-})
-*/

@@ -1,61 +1,55 @@
-import { User } from './typings/user'
-import * as Promise from 'bluebird'
+import { User } from "./typings/user"
 import * as R from "ramda"
+import { verify, VerifyOptions, sign, SignOptions } from "jsonwebtoken"
 
-var jwt = require('jsonwebtoken');
-var jwtVerifyAsync: (token: string, secret: any, options: any) => Promise<any> = Promise.promisify(jwt.verify, jwt);
-
-export module JWT {  
+export module JWT {
   /**
-   * TODO: should work syncronusly -> retun a user not a promise
-   * Returns the user reprisented in the JWT if the JWT is valide
+   * Throws exception if not valide
    */
-  export function getUser(secret: string, auth0ClientID: string, token: string): Promise<User> {
-    const options = {
+  export function getUser(secret: string, auth0ClientID: string, token: string): User {
+    const options: VerifyOptions = {
       audience: auth0ClientID,
       algorithms: ["HS256"]
     }
-
     const isStream = (value: string) => {
-      let start = 'stream-'
+      let start = "stream-"
       return value.substring(0, start.length) === start
     }
 
-    return jwtVerifyAsync(token, new Buffer(secret, 'base64'), options)
-      .then((valideUserdate: User) => {
-        if (typeof valideUserdate.app_metadata === "undefined") {
-          valideUserdate.streamIds = [];
-        }
-        else {
-          let streamKeys = Object.keys(valideUserdate.app_metadata).filter(isStream);
-          valideUserdate.streamIds = streamKeys.map((key: string) => valideUserdate.app_metadata[key])
-        }
-        return valideUserdate
-      })
+    const valideUserdate: User = verify(token, new Buffer(secret, "base64"), options)
+
+    if (typeof valideUserdate.app_metadata === "undefined") {
+      valideUserdate.streamIds = []
+    }
+    else {
+      let streamKeys = Object.keys(valideUserdate.app_metadata).filter(isStream)
+      valideUserdate.streamIds = streamKeys.map((key: string) => valideUserdate.app_metadata[key])
+    }
+    return valideUserdate
   }
 
-  export function signJwt(secret: string, user: User): string {
-    const expIn: number = user.exp - Math.floor(Date.now() / 1000)
-    console.log('userInfo.exp: ' + user.exp + ' - Date' + Math.floor(Date.now() / 1000));
-    
-    const options = {
-      algorithm: 'HS256',
-      expiresIn: expIn,
+  /**
+   * Creates new jwt for the user. With the same expiration date
+   */
+  export function signUser(secret: string, user: User): string {
+    const options: SignOptions = {
+      algorithm: "HS256",
       audience: user.aud,
       subject: user.sub,
-      issuer: 'tradersbit.com'
+      issuer: "tradersbit.com"
     }
     const userToSign = R.clone(user)
     delete userToSign.streamIds
-    return jwt.sign(userToSign, new Buffer(secret, 'base64'), options)
+    delete userToSign.iat
+    return sign(userToSign, new Buffer(secret, "base64"), options)
   }
 
   export function createApiKey(secret: string, user: User, streamId: string, apiKeyId: string): string {
     const options = {
-      algorithm: 'HS256',
+      algorithm: "HS256",
       audience: user.aud,
       subject: user.sub,
-      issuer: 'tradersbit.com'
+      issuer: "tradersbit.com"
     }
 
     const claims = {
@@ -63,13 +57,13 @@ export module JWT {
       "apiKeyId": apiKeyId,
       "userId": user.user_id
     }
-    return jwt.sign(claims, new Buffer(secret, 'base64'), options)
+    return sign(claims, new Buffer(secret, "base64"), options)
   }
 
-  export function updatedJwtWithNewAppData(secret: string, user: User, new_app_metadata: any): string {
+  export function updatedJwtWithNewAppData(secret: string, user: User, newAppMetadata: any): string {
     const newUser = R.clone(user)
-    newUser.app_metadata = new_app_metadata
-    return signJwt(secret, newUser)
+    newUser.app_metadata = newAppMetadata
+    return signUser(secret, newUser)
   }
 
 }

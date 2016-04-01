@@ -1,44 +1,51 @@
-/** 
-import * as R from 'ramda'
-import * as chai from 'chai'
-import * as chaiAsPromised from 'chai-as-promised'
-import * as tv4 from 'tv4'
+import * as test from "tape"
+import * as _ from "ramda"
+import * as sinon from "sinon"
 
-import { TestData, Mock, actionRunner } from './test-util'
-import { JWT } from '../lib/jwt'
-import { User } from './typings/user'
+import { JWT } from "./jwt"
+import { User } from "./typings/user"
 
-chai.use(chaiAsPromised);
-const expect = chai.expect
 
-describe('JWT', () => {
 
-  describe('validateJwt', () => {
-    it('should be rejected when token and secret not match', () => {
-      return expect(JWT.getUser('jwt-secret', '2wW6lKZgFSxjqlHgqUydE9gtkLzt6H4h', 'tokenfdsafdas')).to.be.rejected;
-    })
-//err
-    it('should resolve correctly when JWT is valide', () => {
-      return expect(JWT.getUser('jwt-secret', '2wW6lKZgFSxjqlHgqUydE9gtkLzt6H4h', TestData.valideJwt)).to.eventually.have.property("app_metadata")
-    })
+test("JWT:", (ot) => {
+  ot.plan(2)
 
-    it('should reject unvalid JWT', () => {
-      expect(JWT.getUser('jwt-secret', '2wW6lKZgFSxjqlHgqUydE9gtkLzt6H4h', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoic29nYXNnQGdtYWlsLmNvbSIsImVtYWlsIjoic29nYXNnQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhcHBfbWV0YWRhdGEiOnsic3RyZWFtLTE0NTQ1MjA2MDYzNzUiOiJmZHNhZmRzYS1mZHNhZmRzYS1mZHNhZmRzYSJ9LCJpc3MiOiJodHRwczovL2NsdWRhLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw1NjNjODFlOGVkNDBiMjFjNTI0Yjg2ZWEiLCJhdWQiOiI3Vk5TMlRjMklpUUIyUHZqVUJjYjU3NDRxSDllWTdpQiIsImV4cCI6MzQ0OTcwMjA2MiwiaWF0IjoxNDQ5NjY2MDYyfQ.ABRSrDgO39J9g8yJTCu1XCIJ8Bq3FyCs8UmhGCqBnW0')).to.be.rejected;
-    })
+  const secret = "secret"
+  const auth0ClientID = "test"
+  const user: User = {
+    "email": "test@emsil.com",
+    "user_id": "123",
+    "app_metadata": {
+      "stream-1454292180290": "ee1cc14b-3ad6-4868-929e-6365d1717e9a",
+      "stream-1454703617876": "56843ba3-0581-4abd-be05-76ae38207687"
+    },
+    "iss": "test",
+    "sub": "test",
+    "aud": auth0ClientID,
+    "exp": 2454292180,
+    "iat": 1454292180,
+    "streamIds": ["ee1cc14b-3ad6-4868-929e-6365d1717e9a", "56843ba3-0581-4abd-be05-76ae38207687"]
+  }
 
-    it('should be rejected when token is expired', () => {
-      expect(JWT.getUser('jwt-secret', '2wW6lKZgFSxjqlHgqUydE9gtkLzt6H4h', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoic29nYXNnQGdtYWlsLmNvbSIsImVtYWlsIjoic29nYXNnQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhcHBfbWV0YWRhdGEiOnsic3RyZWFtLTE0NTQ1MjA2MDYzNzUiOiJmZHNhZmRzYS1mZHNhZmRzYS1mZHNhZmRzYSJ9LCJpc3MiOiJodHRwczovL2NsdWRhLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw1NjNjODFlOGVkNDBiMjFjNTI0Yjg2ZWEiLCJhdWQiOiI3Vk5TMlRjMklpUUIyUHZqVUJjYjU3NDRxSDllWTdpQiIsImV4cCI6MTQ0OTcwMjA2MiwiaWF0IjoxNDQ5NjY2MDYyfQ.CYedVa86K2ZXBX9EaWBd91mVp94PGw68yOMcLrhwd6U')).to.be.rejected;
-    })
-//err
-    it('should list a users streams', () => {
-      return JWT.getUser('jwt-secret', '2wW6lKZgFSxjqlHgqUydE9gtkLzt6H4h', TestData.valideJwt)
-      .then((user: User) => {
-        expect(user.streamIds[0]).to.equal("09686c80-30fc-4c85-8403-2721e928ce5f");
-      })
-      
-    })
+  ot.test("- should be able to sign a user and verify it", (t) => {
+    t.plan(7)
+    const jwt = JWT.signUser(secret, user)
+    const gittenUser = JWT.getUser(secret, auth0ClientID, jwt)
 
+    t.deepEqual(gittenUser.app_metadata, user.app_metadata, "should not change")
+    t.deepEqual(gittenUser.aud, user.aud, "should not change")
+    t.deepEqual(gittenUser.email, user.email, "should not change")
+    t.deepEqual(gittenUser.exp, user.exp, "should not change")
+    t.deepEqual(gittenUser.streamIds, user.streamIds, "should not change")
+
+    t.isNotDeepEqual(gittenUser.iat, user.iat, "should change")
+    t.isNotDeepEqual(gittenUser.iss, user.iss, "should change")
   })
 
-});
-*/
+  ot.test("- should be not be able to sign a user and verify it with wrong secret", (t) => {
+    t.plan(1)
+    const jwt = JWT.signUser(secret, user)
+    t.throws(() => JWT.getUser("wrong", auth0ClientID, jwt), "should throw exception when secret is wrong")
+  })
+
+})

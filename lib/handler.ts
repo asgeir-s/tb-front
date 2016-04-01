@@ -11,9 +11,6 @@ import { validateEvent } from "./event-validator"
 
 export module Handler {
 
-  const userFromJwt: (jwt: string) => Promise<User> =
-    R.curry(JWT.getUser)(process.env.JWT_SECRET, process.env.AUTH0_CLIENT_ID)
-
   export function handle(
     action: (inject: any, event: any, context: Context, user?: User) => Promise<Response>,
     eventSchema: tv4.JsonSchema,
@@ -36,10 +33,7 @@ export module Handler {
           return action(inject, event, context)
         }
         else {
-          return userFromJwt(event.jwt)
-            .then((user: User) => {
-              return action(inject, event, context, user)
-            })
+          return action(inject, event, context, inject.userFromJwt(event.jwt))
         }
       })
       .catch((e: Error) => (e.name === "JsonWebTokenError" || e.name === "TokenExpiredError"), error => {
