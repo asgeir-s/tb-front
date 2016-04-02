@@ -2,7 +2,7 @@ import * as test from "tape"
 import * as _ from "ramda"
 import * as sinon from "sinon"
 
-import { Handler } from "./handler"
+import { handle } from "./handler"
 import { Context } from "./common/typings/aws-lambda"
 import { User } from "./common/typings/jwt-user"
 import { Responds } from "./common/typings/responds"
@@ -35,7 +35,7 @@ test("Handler:", (ot) => {
   ot.test("- for public endpint; should reject invalide event event", (t) => {
     t.plan(4)
 
-    Handler.handle(testAction,
+    handle(testAction,
       {
         "title": "Example Schema",
         "type": "object",
@@ -60,7 +60,7 @@ test("Handler:", (ot) => {
   ot.test("- for public endpint; should reject when unvalide schema", (t) => {
     t.plan(4)
 
-    Handler.handle(testAction,
+    handle(testAction,
       {
         "22": "Example Schema",
         "type": "O33",
@@ -85,7 +85,7 @@ test("Handler:", (ot) => {
   ot.test("- for public endpint; should run succesfull when all is OK", (t) => {
     t.plan(4)
 
-    Handler.handle(testAction,
+    handle(testAction,
       {
         "title": "Example Schema",
         "type": "object",
@@ -110,7 +110,7 @@ test("Handler:", (ot) => {
   ot.test("- for not public endpint; should not authenticate with fake JWT", (t) => {
     t.plan(4)
 
-    Handler.handle(testAction,
+    handle(testAction,
       {
         "title": "Example Schema",
         "type": "object",
@@ -143,7 +143,7 @@ test("Handler:", (ot) => {
   ot.test("- for not public endpint; should not authenticate with expired JWT", (t) => {
     t.plan(4)
 
-    Handler.handle(testAction,
+    handle(testAction,
       {
         "title": "Example Schema",
         "type": "object",
@@ -176,7 +176,7 @@ test("Handler:", (ot) => {
   ot.test("- for public endpint; should return internal server error when the action throws an error", (t) => {
     t.plan(4)
 
-    Handler.handle(testActionThrow,
+    handle(testActionThrow,
       {
         "title": "Example Schema",
         "type": "object",
@@ -201,7 +201,7 @@ test("Handler:", (ot) => {
   ot.test("- for not public endpint; should authenticate with right JWT", (t) => {
     t.plan(5)
 
-    Handler.handle(testAction,
+    handle(testAction,
       {
         "title": "Example Schema",
         "type": "object",

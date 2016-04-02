@@ -49,12 +49,18 @@ export module Streams {
         "id": streamId
       },
       AttributesToGet: attributesToGet
-    }).then((responds: any) => json2Stream(authLevel, responds.Item))
+    }).then((responds: any) => {
+      if (responds.Item === undefined) {
+        return undefined
+      }
+      else {
+        return json2Stream(authLevel, responds.Item)
+      }
+    })
   }
 
 
-  export function getAllStremsPublic(documentClient: any, streamTableName: string, authLevel: AuthLevel
-  ): Promise<Array<Stream>> {
+  export function getAllStremsPublic(documentClient: any, streamTableName: string): Promise<Array<Stream>> {
     return documentClient.scanAsync({
       TableName: streamTableName,
       AttributesToGet: _.clone(publicAttributes)

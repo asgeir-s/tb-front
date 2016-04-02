@@ -6,7 +6,7 @@ import * as sinon from "sinon"
 
 
 test("Streams.getStream:", (ot) => {
-  ot.plan(3)
+  ot.plan(4)
 
   const databaseCli = DynamoDb.documentClientAsync("us-west-2")
   const timestamp = new Date().getTime()
@@ -28,6 +28,16 @@ test("Streams.getStream:", (ot) => {
         t.equal(_.has("subscriptionPriceUSD", stream), true, "should return public fields")
         t.equal(_.has("exchange", stream), true, "should return public fields")
         t.equal(_.has("id", stream), true, "should return public fields")
+      })
+  })
+
+  ot.test("- when stream is not found should return undefined", (t) => {
+    t.plan(1)
+
+    Streams.getStream(databaseCli, "streams-staging", AuthLevel.Public,
+      "not-real")
+      .then((stream) => {
+        t.equal(stream, undefined, "should not return undefined")
       })
   })
 
@@ -77,7 +87,7 @@ test("Streams.getAllStremsPublic: - should get back Public stream info", (t) => 
   const databaseCli = DynamoDb.documentClientAsync("us-west-2")
   const timestamp = new Date().getTime()
 
-  Streams.getAllStremsPublic(databaseCli, "streams-staging", AuthLevel.Public)
+  Streams.getAllStremsPublic(databaseCli, "streams-staging")
     .then((streams) => {
       _.take(3, streams).map((stream) => {
         t.equal(_.has("lastSignal", stream), false, "should not return auth fields")

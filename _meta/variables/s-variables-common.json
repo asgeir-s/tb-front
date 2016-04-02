@@ -1,3 +1,5 @@
 {
-  "project": "tb-front"
+  "project": "tb-front",
+  "dynamo-table-streams": "streams-staging",
+  "dynamo-region": "us-west-2"
 }

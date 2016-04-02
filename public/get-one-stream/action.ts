@@ -8,19 +8,29 @@ import { Stream } from "../../lib/common/typings/stream"
 
 
 export interface Inject {
-  getStreams: () => Promise<Array<Stream>>
+  getStream: (streamId: string) => Promise<Stream>
 }
 
-export module GetStreams {
+export module GetStream {
 
   export function action(inn: Inject, event: any, context: Context): Promise<Responds> {
-    return inn.getStreams()
-      .then(streams => {
+    return inn.getStream(event.streamId)
+      .then(stream => {
+        if (stream == null) {
         return {
           "GRID": context.awsRequestId,
-          "data": streams,
-          "success": true,
-          "statusCode": 200
+          "data": "Not Found",
+          "success": false,
+          "statusCode": 404
+        }
+        }
+        else {
+          return {
+            "GRID": context.awsRequestId,
+            "data": stream,
+            "success": true,
+            "statusCode": 200
+          }
         }
       })
   }

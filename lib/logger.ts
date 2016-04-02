@@ -36,7 +36,7 @@ function logMessage(logLevel: string, message: any, data: any) {
   return console.log(JSON.stringify({
     "level": logLevel,
     "message": message,
-    "data": data
+    "data": data instanceof Array ? data.slice(0, 4).push("TRUNCATED...") : data
   }))
 }
 
@@ -57,7 +57,7 @@ function userLogMessage(userId: string, logLevel: string, message: any, data: an
     "level": logLevel,
     "user": userId,
     "message": message,
-    "data": data
+    "data": data instanceof Array ? data.slice(0, 4).push("TRUNCATED...") : data
   }))
 }
 
