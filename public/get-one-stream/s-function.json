@@ -13,15 +13,17 @@
   },
   "endpoints": [
     {
-      "path": "get-one-stream",
+      "path": "streams/{streamId}",
       "method": "GET",
       "type": "AWS",
       "authorizationType": "none",
       "authorizerFunction": false,
       "apiKeyRequired": false,
-      "requestParameters": {},
+      "requestParameters": {
+        "integration.request.path.integrationQueryParam": "method.request.path.streamId"
+      },
       "requestTemplates": {
-        "application/json": ""
+        "application/json": "{\"streamId\":\"$util.urlDecode($input.params('streamId'))\"}"
       },
       "responses": {
         "400": {
