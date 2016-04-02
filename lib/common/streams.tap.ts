@@ -4,11 +4,13 @@ import * as _ from "ramda"
 import { Streams, AuthLevel } from "./streams"
 import * as sinon from "sinon"
 
-
 test("Streams.getStream:", (ot) => {
   ot.plan(4)
 
-  const databaseCli = DynamoDb.documentClientAsync("us-west-2")
+  const DYNAMO_REGION = "us-west-2"
+
+
+  const databaseCli = DynamoDb.documentClientAsync(DYNAMO_REGION)
   const timestamp = new Date().getTime()
 
   ot.test("- should be able to get Public stream info", (t) => {

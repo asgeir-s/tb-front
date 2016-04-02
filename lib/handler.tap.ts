@@ -83,7 +83,7 @@ test("Handler:", (ot) => {
   })
 
   ot.test("- for public endpint; should run succesfull when all is OK", (t) => {
-    t.plan(4)
+    t.plan(2)
 
     handle(testAction,
       {
@@ -100,9 +100,7 @@ test("Handler:", (ot) => {
         awsRequestId: "test-grid",
         done: (err: any, res: any) => {
           t.equal(err, null)
-          t.equal(res.success, true, "should be succesfull")
-          t.equal(res.statusCode, 200, "should return success statusCode")
-          t.equal(res.GRID, "some-grid-123", "should returne GRID from testAction")
+          t.deepEqual(res, { "user": "" }, "should be succesfull")
         }
       } as any), true)
   })
@@ -199,7 +197,7 @@ test("Handler:", (ot) => {
   })
 
   ot.test("- for not public endpint; should authenticate with right JWT", (t) => {
-    t.plan(5)
+    t.plan(2)
 
     handle(testAction,
       {
@@ -224,10 +222,7 @@ test("Handler:", (ot) => {
         awsRequestId: "test-grid",
         done: (err: any, res: any) => {
           t.equal(err, null)
-          t.equal(res.success, true, "should be succesfull")
-          t.equal(res.statusCode, 200, "should get back success statusCode")
-          t.equal(res.GRID, "some-grid-123", "should get back the GRID from the testAction")
-          t.equal(res.data.user, "test@emsil.com", "should get the user correctly")
+          t.equal(res.user, "test@emsil.com", "should get the user correctly")
         }
       } as any), false)
   })

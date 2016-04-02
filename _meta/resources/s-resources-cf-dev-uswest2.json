@@ -39,6 +39,19 @@
                 "logs:PutLogEvents"
               ],
               "Resource": "arn:aws:logs:us-west-2:*:*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DescribeStream",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:ListStreams",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan"
+              ],
+              "Resource": "arn:aws:dynamodb:us-west-2:*:*"
             }
           ]
         },

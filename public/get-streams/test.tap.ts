@@ -9,7 +9,7 @@ import { DynamoDb } from "../../lib/common/aws"
 import { GetStreams, Inject } from "./action"
 
 const DYNAMO_REGION = "us-west-2"
-const DYNAMO_TABLE_STREAMS = "streams-staging",
+const DYNAMO_TABLE_STREAMS = "streams-staging"
 
 const event = require("./event.json")
 

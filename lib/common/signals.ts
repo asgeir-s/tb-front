@@ -27,4 +27,25 @@ export module Signals {
       }
     })
   }
+
+  export function getAllSignals(signalServiceUrl: string, signalServiceApiKey: string,
+    GRID: string, streamId: string): Promise<Array<Signal>> {
+    return requestAsync({
+      method: "GET",
+      uri: signalServiceUrl + "/streams/" + streamId + "/signals?onlyClosed=true",
+      headers: {
+        "Global-Request-ID": GRID,
+        "content-type": "application/json",
+        "Authorization": "apikey " + signalServiceApiKey
+      },
+      json: true
+    }).then((res: any) => {
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        throw new Error(res.body)
+      }
+      else {
+        return res.body
+      }
+    })
+  }
 }

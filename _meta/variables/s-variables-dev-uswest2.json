@@ -1,5 +1,6 @@
 {
   "region": "us-west-2",
   "resourcesStackName": "tb-front-dev-r",
-  "iamRoleArnLambda": "arn:aws:iam::525932482084:role/tb-front-dev-r-IamRoleLambda-ERRHYBOJWEGM"
+  "iamRoleArnLambda": "arn:aws:iam::525932482084:role/tb-front-dev-r-IamRoleLambda-ERRHYBOJWEGM",
+  "apiGatewayApi": "tb-front"
 }
