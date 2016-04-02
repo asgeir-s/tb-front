@@ -28,7 +28,7 @@ export module Signals {
     })
   }
 
-  export function getAllSignals(signalServiceUrl: string, signalServiceApiKey: string,
+  export function getClosedSignals(signalServiceUrl: string, signalServiceApiKey: string,
     GRID: string, streamId: string): Promise<Array<Signal>> {
     return requestAsync({
       method: "GET",

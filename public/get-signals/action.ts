@@ -11,7 +11,7 @@ export interface Inject {
   getSignals: (GROD: string, streamId: string) => Promise<Array<Signal>>
 }
 
-export module GetStream {
+export module GetSignals {
 
   export function action(inn: Inject, event: any, context: Context): Promise<Responds> {
     return inn.getSignals(context.awsRequestId, event.streamId)

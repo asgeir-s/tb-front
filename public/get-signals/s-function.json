@@ -2,26 +2,28 @@
   "name": "get-signals",
   "runtime": "nodejs",
   "description": "Serverless Lambda function for project: tb-front",
-  "customName": false,
+  "customName": "tb-front_public_get-signals",
   "customRole": false,
-  "handler": "handler.handler",
+  "handler": "public/get-signals/handler.handler",
   "timeout": 6,
-  "memorySize": 1024,
+  "memorySize": 1500,
   "authorizer": {},
   "custom": {
     "excludePatterns": []
   },
   "endpoints": [
     {
-      "path": "get-signals",
+      "path": "streams/{streamId}/signals",
       "method": "GET",
       "type": "AWS",
       "authorizationType": "none",
       "authorizerFunction": false,
       "apiKeyRequired": false,
-      "requestParameters": {},
+      "requestParameters": {
+        "integration.request.path.integrationQueryParam": "method.request.path.streamId"
+      },
       "requestTemplates": {
-        "application/json": ""
+        "application/json": "{\"streamId\":\"$util.urlDecode($input.params('streamId'))\"}"
       },
       "responses": {
         "400": {

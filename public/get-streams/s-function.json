@@ -6,7 +6,7 @@
   "customRole": false,
   "handler": "public/get-streams/handler.handler",
   "timeout": 6,
-  "memorySize": 1024,
+  "memorySize": 1500,
   "authorizer": {},
   "custom": {
     "excludePatterns": []
