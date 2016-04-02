@@ -1,4 +1,4 @@
-import { User } from "./typings/user"
+import { User } from "./common/typings/jwt-user"
 import * as R from "ramda"
 import { verify, VerifyOptions, sign, SignOptions } from "jsonwebtoken"
 

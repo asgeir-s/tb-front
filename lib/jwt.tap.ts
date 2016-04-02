@@ -3,7 +3,7 @@ import * as _ from "ramda"
 import * as sinon from "sinon"
 
 import { JWT } from "./jwt"
-import { User } from "./typings/user"
+import { User } from "./common/typings/jwt-user"
 
 
 

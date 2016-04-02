@@ -3,9 +3,9 @@ import * as _ from "ramda"
 import * as sinon from "sinon"
 
 import { Handler } from "./handler"
-import { Context } from "./typings/aws-lambda"
-import { User } from "./typings/user"
-import { Response } from "./typings/response"
+import { Context } from "./common/typings/aws-lambda"
+import { User } from "./common/typings/jwt-user"
+import { Responds } from "./common/typings/responds"
 import { JWT } from "./jwt"
 
 
@@ -15,7 +15,7 @@ test("Handler:", (ot) => {
 
   ot.plan(7)
 
-  function testAction(inject: any, event: any, context: Context, user?: User): Promise<Response> {
+  function testAction(inject: any, event: any, context: Context, user?: User): Promise<Responds> {
     return Promise.resolve({
       "GRID": "some-grid-123",
       "statusCode": 200,
@@ -26,8 +26,8 @@ test("Handler:", (ot) => {
     })
   }
 
-  function testActionThrow(inject: any, event: any, context: Context, user?: User): Promise<Response> {
-    return new Promise<Response>((resolve, reject) => {
+  function testActionThrow(inject: any, event: any, context: Context, user?: User): Promise<Responds> {
+    return new Promise<Responds>((resolve, reject) => {
       throw new Error("test error")
     })
   }

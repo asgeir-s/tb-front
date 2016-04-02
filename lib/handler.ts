@@ -2,17 +2,17 @@ import * as R from "ramda"
 import * as Promise from "bluebird"
 import * as tv4 from "tv4"
 
-import { Context } from "./typings/aws-lambda"
+import { Context } from "./common/typings/aws-lambda"
 import { JWT } from "./jwt"
-import { User } from "./typings/user"
-import { Response } from "./typings/response"
+import { User } from "./common/typings/jwt-user"
+import { Responds } from "./common/typings/responds"
 import { log, userLog } from "./logger"
 import { validateEvent } from "./event-validator"
 
 export module Handler {
 
   export function handle(
-    action: (inject: any, event: any, context: Context, user?: User) => Promise<Response>,
+    action: (inject: any, event: any, context: Context, user?: User) => Promise<Responds>,
     eventSchema: tv4.JsonSchema,
     inject: any,
     event: any,

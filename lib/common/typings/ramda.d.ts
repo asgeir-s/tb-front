@@ -1002,10 +1002,12 @@ declare module R {
         /**
          * TODO composeK
          */
+        composeK: any
 
         /**
          * TODO composeP
          */
+        composeP: any
 
         construct(fn: Function): Function;
 

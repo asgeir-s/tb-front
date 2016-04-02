@@ -1,4 +1,3 @@
-import * as R from "ramda"
 import * as Promise from "bluebird"
 import * as tv4 from "tv4"
 
