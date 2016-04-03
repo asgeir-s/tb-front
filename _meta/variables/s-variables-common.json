@@ -3,5 +3,6 @@
   "dynamo-table-streams": "streams-staging",
   "dynamo-region": "us-west-2",
   "serviceUrl-tbSignals": "http://tb-staging-signals.elasticbeanstalk.com",
-  "serviceApiKey-tbSignals": "secret"
+  "serviceApiKey-tbSignals": "secret",
+  "url-tb-back": "https://86jxkw20u2.execute-api.us-west-2.amazonaws.com/dev/"
 }

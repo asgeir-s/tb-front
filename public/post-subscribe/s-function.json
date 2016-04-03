@@ -1,0 +1,54 @@
+{
+  "name": "post-subscribe",
+  "runtime": "nodejs",
+  "description": "Serverless Lambda function for project: tb-front",
+  "customName": "tb-front_public_post-subscribe",
+  "customRole": false,
+  "handler": "public/post-subscribe/handler.handler",
+  "timeout": 6,
+  "memorySize": 1024,
+  "authorizer": {},
+  "custom": {
+    "excludePatterns": []
+  },
+  "endpoints": [
+    {
+      "path": "subscribe",
+      "method": "POST",
+      "type": "AWS",
+      "authorizationType": "none",
+      "authorizerFunction": false,
+      "apiKeyRequired": false,
+      "requestParameters": {
+        "integration.request.header.x-re-captcha": "method.request.header.x-re-captcha"
+      },
+      "requestTemplates": {
+        "application/json": "{\"recaptcha\":\"$util.urlDecode($input.params('x-re-captcha'))\", \"subscription\": $input.json('$') }"
+      },
+      "responses": {
+        "400": {
+          "statusCode": "400"
+        },
+        "default": {
+          "statusCode": "200",
+          "responseParameters": {},
+          "responseModels": {},
+          "responseTemplates": {
+            "application/json": ""
+          }
+        }
+      }
+    }
+  ],
+  "events": [],
+  "environment": {
+    "SERVERLESS_PROJECT": "${project}",
+    "SERVERLESS_STAGE": "${stage}",
+    "SERVERLESS_REGION": "${region}",
+    "TB_BACK_URL": "${url-tb-back}"
+  },
+  "vpc": {
+    "securityGroupIds": [],
+    "subnetIds": []
+  }
+}

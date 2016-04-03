@@ -66,7 +66,6 @@ export function handle(
       if (result.success) {
         log.log("RESULT", "SUCCESS: returning result.data", {
           "GRID": result.GRID,
-          "statusCode": result.statusCode,
           "data": result.data instanceof Array ? {
             "truncatedData": result.data.slice(0, 3),
             "originalLength": result.data.length
