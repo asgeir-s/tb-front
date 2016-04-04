@@ -3,12 +3,14 @@ import { DynamoDb, SES, SNS } from "./aws"
 import * as _ from "ramda"
 import { Streams } from "./streams"
 import * as sinon from "sinon"
+import { NewStreamRequest } from "../../lib/typings/new-stream-request"
+import { guid } from "./guid"
+
 
 test("Streams.getStream:", (ot) => {
-  ot.plan(5)
+  ot.plan(7)
 
   const DYNAMO_REGION = "us-west-2"
-
 
   const databaseCli = DynamoDb.documentClientAsync(DYNAMO_REGION)
   const timestamp = new Date().getTime()
@@ -102,29 +104,57 @@ test("Streams.getStream:", (ot) => {
         t.equal(_.has("idOfLastSignal", stream), true, "should return auth fields")
       })
   })
-})
 
-test("Streams.getAllStremsPublic: - should get back Public stream info", (t) => {
-  t.plan(30)
+  ot.test("- should be possible to add a new stream", (t) => {
+    t.plan(2)
 
-  const databaseCli = DynamoDb.documentClientAsync("us-west-2")
-  const timestamp = new Date().getTime()
+    const STREAM_SERVICE_URL = "http://tb-staging-streams.elasticbeanstalk.com"
+    const STREAM_SERVICE_APIKEY = "secret"
+    const streamName = "streamFromTest" + guid()
+    const newStreamRequest: NewStreamRequest = {
+      "name": streamName,
+      "exchange": "bitfinex",
+      "currencyPair": "btcUSD",
+      "payoutAddress": "1kqHKEYYC8CQPxyV53nCju4Lk2ufpQqA2",
+      "subscriptionPriceUSD": 5,
+      "userId": "auth0|56b23020f971b162055640c3"
+    }
 
-  Streams.getAllStremsPublic(databaseCli, "streams-staging")
-    .then((streams) => {
-      _.take(3, streams).map((stream) => {
-        t.equal(_.has("lastSignal", stream), false, "should not return auth fields")
-        t.equal(_.has("status", stream), false, "should not return auth fields")
-        t.equal(_.has("idOfLastSignal", stream), false, "should not return auth fields")
-        t.equal(_.has("streamPrivate", stream), false, "should not return private fields")
+    Streams.addNewStream(STREAM_SERVICE_URL, STREAM_SERVICE_APIKEY, "test-GRID", newStreamRequest)
+      .then(newStreamId => {
+        t.equal(newStreamId.length > 10, true, "should return the new streamId")
+      })
+      .then(() => {
+        Streams.addNewStream(STREAM_SERVICE_URL, STREAM_SERVICE_APIKEY, "test-GRID", newStreamRequest)
+          .catch((error: Error) => {
+            t.equal(error.message.indexOf("A stream with this name already exists") > -1, true,
+              "should not be possible to add a stream with the same name again")
+          })
+      })
+  })
 
-        t.equal(_.has("currencyPair", stream), true, "should return public fields")
-        t.equal(_.has("name", stream), true, "should return public fields")
-        t.equal(_.has("stats", stream), true, "should return public fields")
-        t.equal(_.has("subscriptionPriceUSD", stream), true, "should return public fields")
-        t.equal(_.has("exchange", stream), true, "should return public fields")
-        t.equal(_.has("id", stream), true, "should return public fields")
-      }
-      )
-    })
+  ot.test("- should get Streams.getAllStremsPublic: ", (t) => {
+    t.plan(30)
+
+    const databaseCli = DynamoDb.documentClientAsync("us-west-2")
+    const timestamp = new Date().getTime()
+
+    Streams.getAllStremsPublic(databaseCli, "streams-staging")
+      .then((streams) => {
+        _.take(3, streams).map((stream) => {
+          t.equal(_.has("lastSignal", stream), false, "should not return auth fields")
+          t.equal(_.has("status", stream), false, "should not return auth fields")
+          t.equal(_.has("idOfLastSignal", stream), false, "should not return auth fields")
+          t.equal(_.has("streamPrivate", stream), false, "should not return private fields")
+
+          t.equal(_.has("currencyPair", stream), true, "should return public fields")
+          t.equal(_.has("name", stream), true, "should return public fields")
+          t.equal(_.has("stats", stream), true, "should return public fields")
+          t.equal(_.has("subscriptionPriceUSD", stream), true, "should return public fields")
+          t.equal(_.has("exchange", stream), true, "should return public fields")
+          t.equal(_.has("id", stream), true, "should return public fields")
+        }
+        )
+      })
+  })
 })

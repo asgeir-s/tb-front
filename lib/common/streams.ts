@@ -4,6 +4,9 @@ import * as _ from "ramda"
 
 import { Stream, Stats, StreamPrivate } from "./typings/stream"
 import { Signal } from "./typings/signal"
+import { NewStreamRequest } from "../../lib/typings/new-stream-request"
+
+const requestAsync = Promise.promisify(request)
 
 export module Streams {
 
@@ -197,5 +200,38 @@ export module Streams {
       }
     }
 
+  }
+
+
+  // legacy:
+
+
+  /**
+   * returns the new streamId
+   */
+  export function addNewStream(streamServiceUrl: string, streamServiceApiKey: string, GRID: string,
+    newStreamRequest: NewStreamRequest): Promise<string> {
+    return requestAsync({
+      method: "POST",
+      uri: streamServiceUrl + "/streams",
+      headers: {
+        "Global-Request-ID": GRID,
+        "content-type": "application/json",
+        "Authorization": "apikey " + streamServiceApiKey
+      },
+      body: newStreamRequest,
+      json: true
+    })
+      .then((res: any) => {
+        if (res.statusCode === 409) {
+          throw new Error("A stream with this name already exists.")
+        }
+        else if (res.statusCode < 200 || res.statusCode >= 300) {
+          throw new Error(JSON.stringify(res))
+        }
+        else {
+          return res.body.id
+        }
+      })
   }
 }
