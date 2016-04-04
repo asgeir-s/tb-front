@@ -1,11 +1,11 @@
 import * as test from "tape"
 import { DynamoDb, SES, SNS } from "./aws"
 import * as _ from "ramda"
-import { Streams, AuthLevel } from "./streams"
+import { Streams } from "./streams"
 import * as sinon from "sinon"
 
 test("Streams.getStream:", (ot) => {
-  ot.plan(4)
+  ot.plan(5)
 
   const DYNAMO_REGION = "us-west-2"
 
@@ -16,9 +16,30 @@ test("Streams.getStream:", (ot) => {
   ot.test("- should be able to get Public stream info", (t) => {
     t.plan(10)
 
-    Streams.getStream(databaseCli, "streams-staging", AuthLevel.Public,
+    Streams.getStream(databaseCli, "streams-staging", Streams.AuthLevel.Public,
       "43a2cfb3-6026-4a85-b3ab-2468f7d963aa")
       .then((stream) => {
+        t.equal(_.has("lastSignal", stream), false, "should not return auth fields")
+        t.equal(_.has("status", stream), false, "should not return auth fields")
+        t.equal(_.has("idOfLastSignal", stream), false, "should not return auth fields")
+        t.equal(_.has("streamPrivate", stream), false, "should not return private fields")
+
+        t.equal(_.has("currencyPair", stream), true, "should return public fields")
+        t.equal(_.has("name", stream), true, "should return public fields")
+        t.equal(_.has("stats", stream), true, "should return public fields")
+        t.equal(_.has("subscriptionPriceUSD", stream), true, "should return public fields")
+        t.equal(_.has("exchange", stream), true, "should return public fields")
+        t.equal(_.has("id", stream), true, "should return public fields")
+      })
+  })
+
+  ot.test("- BATCH GET", (t) => {
+    t.plan(10)
+
+    Streams.getStreams(databaseCli, "streams-staging", Streams.AuthLevel.Public,
+      ["43a2cfb3-6026-4a85-b3ab-2468f7d963aa"])
+      .then((streamArray) => {
+        const stream = streamArray[0]
         t.equal(_.has("lastSignal", stream), false, "should not return auth fields")
         t.equal(_.has("status", stream), false, "should not return auth fields")
         t.equal(_.has("idOfLastSignal", stream), false, "should not return auth fields")
@@ -36,7 +57,7 @@ test("Streams.getStream:", (ot) => {
   ot.test("- when stream is not found should return undefined", (t) => {
     t.plan(1)
 
-    Streams.getStream(databaseCli, "streams-staging", AuthLevel.Public,
+    Streams.getStream(databaseCli, "streams-staging", Streams.AuthLevel.Public,
       "not-real")
       .then((stream) => {
         t.equal(stream, undefined, "should not return undefined")
@@ -46,7 +67,7 @@ test("Streams.getStream:", (ot) => {
   ot.test("- should be able to get Auth stream info", (t) => {
     t.plan(10)
 
-    Streams.getStream(databaseCli, "streams-staging", AuthLevel.Auth,
+    Streams.getStream(databaseCli, "streams-staging", Streams.AuthLevel.Auth,
       "43a2cfb3-6026-4a85-b3ab-2468f7d963aa")
       .then((stream) => {
         t.equal(_.has("streamPrivate", stream), false, "should not return private fields")
@@ -66,7 +87,7 @@ test("Streams.getStream:", (ot) => {
   ot.test("- should be able to get Private stream info", (t) => {
     t.plan(10)
 
-    Streams.getStream(databaseCli, "streams-staging", AuthLevel.Private,
+    Streams.getStream(databaseCli, "streams-staging", Streams.AuthLevel.Private,
       "43a2cfb3-6026-4a85-b3ab-2468f7d963aa")
       .then((stream) => {
         t.equal(_.has("streamPrivate", stream), true, "should return private fields")

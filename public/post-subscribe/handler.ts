@@ -4,7 +4,7 @@ import { Context } from "../../lib/common//typings/aws-lambda"
 import { handle } from "../../lib/handler"
 import { Subscription } from "../../lib/common/subscription"
 import { DynamoDb } from "../../lib/common/aws"
-import { PostSubscribe, Inject } from "./action"
+import { PostSubscribe } from "./action"
 import { Recaptcha } from "../../lib/recaptcha"
 import { log } from "../../lib/logger"
 
@@ -42,7 +42,7 @@ export const eventSchema = {
   "required": ["recaptcha", "subscription"]
 }
 
-const inject: Inject = {
+const inject: PostSubscribe.Inject = {
   getPaymentCode: _.curry(Subscription.getPaymentCode)(process.env.TB_BACK_URL)
 }
 

@@ -5,21 +5,29 @@ import * as _ from "ramda"
 import { Stream, Stats, StreamPrivate } from "./typings/stream"
 import { Signal } from "./typings/signal"
 
-export enum AuthLevel {
-  Public,
-  Auth,
-  Private
-}
-
-const publicAttributes: Array<string> = ["accumulatedLoss", "accumulatedProfit", "allTimeValueExcl",
-  "allTimeValueIncl", "buyAndHoldChange", "currencyPair", "exchange", "firstPrice", "id", "maxDDMax",
-  "maxDDPrevMax", "maxDDPrevMin", "maxDrawDown", "name", "numberOfClosedTrades", "numberOfLoosingTrades",
-  "numberOfProfitableTrades", "numberOfSignals", "subscriptionPriceUSD", "timeOfFirstSignal"]
-
 export module Streams {
+
+  export enum AuthLevel {
+    Public,
+    Auth,
+    Private
+  }
+
+  const publicAttributes: Array<string> = ["accumulatedLoss", "accumulatedProfit", "allTimeValueExcl",
+    "allTimeValueIncl", "buyAndHoldChange", "currencyPair", "exchange", "firstPrice", "id", "maxDDMax",
+    "maxDDPrevMax", "maxDDPrevMin", "maxDrawDown", "name", "numberOfClosedTrades", "numberOfLoosingTrades",
+    "numberOfProfitableTrades", "numberOfSignals", "subscriptionPriceUSD", "timeOfFirstSignal"]
+
 
   export function getStream(documentClient: any, streamTableName: string, authLevel: AuthLevel,
     streamId: string): Promise<Stream> {
+    return getStreams(documentClient, streamTableName, authLevel, [streamId])
+      .then(streamArray => streamArray[0])
+  }
+
+  export function getStreams(documentClient: any, streamTableName: string, authLevel: AuthLevel,
+    streamIds: Array<String>): Promise<Array<Stream>> {
+
     let attributesToGet: Array<string>
 
     switch (authLevel) {
@@ -42,21 +50,20 @@ export module Streams {
       }
     }
 
+    let requestItems: any = {}
+    requestItems[streamTableName] = {
+      "Keys": streamIds.map(id => { return { "id": id } }),
+      "AttributesToGet": attributesToGet
+    }
+
     // get stream from dynamo (select variables from auth level)
-    return documentClient.getAsync({
-      TableName: streamTableName,
-      Key: {
-        "id": streamId
-      },
-      AttributesToGet: attributesToGet
-    }).then((responds: any) => {
-      if (responds.Item === undefined) {
-        return undefined
-      }
-      else {
-        return json2Stream(authLevel, responds.Item)
-      }
+    return documentClient.batchGetAsync({
+      "RequestItems": requestItems
     })
+      .then((responds: any) => {
+        return responds.Responses[streamTableName]
+      })
+      .map((streamJson: any) => json2Stream(authLevel, streamJson))
   }
 
 

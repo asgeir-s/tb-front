@@ -6,7 +6,7 @@ import { Context } from "../../lib/common//typings/aws-lambda"
 import { handle } from "../../lib/handler"
 import { Streams } from "../../lib/common/streams"
 import { DynamoDb } from "../../lib/common/aws"
-import { GetStreams, Inject } from "./action"
+import { GetStreams } from "./action"
 
 const DYNAMO_REGION = "us-west-2"
 const DYNAMO_TABLE_STREAMS = "streams-staging"
@@ -21,7 +21,7 @@ test("get-streams:", (ot) => {
   ot.test("- should get all streams with only public data", (t) => {
     t.plan(30)
 
-    const inject: Inject = {
+    const inject: GetStreams.Inject = {
       getStreams: () => Streams.getAllStremsPublic(dynamoClient, DYNAMO_TABLE_STREAMS)
     }
 

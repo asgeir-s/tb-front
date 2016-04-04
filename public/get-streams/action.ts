@@ -6,12 +6,11 @@ import { log } from "../../lib/logger"
 import { Responds } from "../../lib/common/typings/responds"
 import { Stream } from "../../lib/common/typings/stream"
 
-
-export interface Inject {
-  getStreams: () => Promise<Array<Stream>>
-}
-
 export module GetStreams {
+
+  export interface Inject {
+    getStreams: () => Promise<Array<Stream>>
+  }
 
   export function action(inn: Inject, event: any, context: Context): Promise<Responds> {
     return inn.getStreams()

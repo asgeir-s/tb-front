@@ -6,9 +6,9 @@ import * as tv4 from "tv4"
 
 import { Context } from "../../lib/common//typings/aws-lambda"
 import { handle } from "../../lib/handler"
-import { Streams, AuthLevel } from "../../lib/common/streams"
+import { Streams } from "../../lib/common/streams"
 import { DynamoDb } from "../../lib/common/aws"
-import { GetSignals, Inject } from "./action"
+import { GetSignals } from "./action"
 import { eventSchema } from "./handler"
 import { Signals } from "../../lib/common/signals"
 
@@ -29,7 +29,7 @@ test("get-streams:", (ot) => {
   })
 
 
-  const inject: Inject = {
+  const inject: GetSignals.Inject = {
     getSignals: _.curry(Signals.getClosedSignals)(SIGNALS_URL, SIGNALS_APIKEY)
   }
 

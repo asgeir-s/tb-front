@@ -2,9 +2,9 @@ import * as _ from "ramda"
 
 import { Context } from "../../lib/common//typings/aws-lambda"
 import { handle } from "../../lib/handler"
-import { Streams, AuthLevel } from "../../lib/common/streams"
+import { Streams } from "../../lib/common/streams"
 import { DynamoDb } from "../../lib/common/aws"
-import { GetStream, Inject } from "./action"
+import { GetStream } from "./action"
 
 const publicEndpoint = true
 export const eventSchema = {
@@ -20,8 +20,8 @@ export const eventSchema = {
 
 const dynamoClient = DynamoDb.documentClientAsync(process.env.DYNAMO_REGION)
 
-const inject: Inject = {
-  getStream: _.curry(Streams.getStream)(dynamoClient, process.env.DYNAMO_TABLE_STREAMS, AuthLevel.Public)
+const inject: GetStream.Inject = {
+  getStream: _.curry(Streams.getStream)(dynamoClient, process.env.DYNAMO_TABLE_STREAMS, Streams.AuthLevel.Public)
 }
 
 export function handler(event: any, context: Context) {

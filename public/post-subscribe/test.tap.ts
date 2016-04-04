@@ -6,9 +6,9 @@ import * as tv4 from "tv4"
 
 import { Context } from "../../lib/common//typings/aws-lambda"
 import { handle } from "../../lib/handler"
-import { Streams, AuthLevel } from "../../lib/common/streams"
+import { Streams } from "../../lib/common/streams"
 import { DynamoDb } from "../../lib/common/aws"
-import { PostSubscribe, Inject } from "./action"
+import { PostSubscribe } from "./action"
 import { eventSchema } from "./handler"
 import { Signals } from "../../lib/common/signals"
 import { Subscription } from "../../lib/common/subscription"
@@ -29,7 +29,7 @@ test("PostSubscribe:", (ot) => {
   })
 
 
-  const inject: Inject = {
+  const inject: PostSubscribe.Inject = {
     getPaymentCode: _.curry(Subscription.getPaymentCode)(TB_BACK_URL)
   }
 

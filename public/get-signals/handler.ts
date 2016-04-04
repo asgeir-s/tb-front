@@ -4,7 +4,7 @@ import { Context } from "../../lib/common//typings/aws-lambda"
 import { handle } from "../../lib/handler"
 import { Signals } from "../../lib/common/signals"
 import { DynamoDb } from "../../lib/common/aws"
-import { GetSignals, Inject } from "./action"
+import { GetSignals } from "./action"
 
 const publicEndpoint = true
 export const eventSchema = {
@@ -18,7 +18,7 @@ export const eventSchema = {
   "required": ["streamId"]
 }
 
-const inject: Inject = {
+const inject: GetSignals.Inject = {
   getSignals: _.curry(Signals.getClosedSignals)(process.env.SIGNALS_URL, process.env.SIGNALS_APIKEY)
 }
 

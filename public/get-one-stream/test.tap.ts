@@ -6,9 +6,9 @@ import * as tv4 from "tv4"
 
 import { Context } from "../../lib/common//typings/aws-lambda"
 import { handle } from "../../lib/handler"
-import { Streams, AuthLevel } from "../../lib/common/streams"
+import { Streams } from "../../lib/common/streams"
 import { DynamoDb } from "../../lib/common/aws"
-import { GetStream, Inject } from "./action"
+import { GetStream } from "./action"
 import { eventSchema } from "./handler"
 
 
@@ -33,8 +33,8 @@ test("get-streams:", (ot) => {
   ot.test("- should get one stream with only public data", (t) => {
     t.plan(10)
 
-    const inject: Inject = {
-      getStream: _.curry(Streams.getStream)(dynamoClient, DYNAMO_TABLE_STREAMS, AuthLevel.Public)
+    const inject: GetStream.Inject = {
+      getStream: _.curry(Streams.getStream)(dynamoClient, DYNAMO_TABLE_STREAMS, Streams.AuthLevel.Public)
     }
 
     GetStream.action(inject, event, <Context>{ awsRequestId: "test-request" })
@@ -57,8 +57,8 @@ test("get-streams:", (ot) => {
   ot.test("- should return 404 when stream does not exist", (t) => {
     t.plan(3)
 
-    const inject: Inject = {
-      getStream: _.curry(Streams.getStream)(dynamoClient, DYNAMO_TABLE_STREAMS, AuthLevel.Public)
+    const inject: GetStream.Inject = {
+      getStream: _.curry(Streams.getStream)(dynamoClient, DYNAMO_TABLE_STREAMS, Streams.AuthLevel.Public)
     }
 
     GetStream.action(inject, { "streamId": "fake" }, <Context>{ awsRequestId: "test-request" })
