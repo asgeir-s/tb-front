@@ -9,7 +9,10 @@ import { Responds } from "./common/typings/responds"
 import { log, userLog } from "./logger"
 import { validateEvent } from "./event-validator"
 
-
+/**
+ * If publicEndpoint is false jwtSecret and auth0ClientId is not neede.
+ * Default is publicEndpoint: false
+ */
 export function handle(
   action: (inject: any, event: any, context: Context, user?: User) => Promise<Responds>,
   eventSchema: tv4.JsonSchema,
@@ -17,7 +20,9 @@ export function handle(
   event: any,
   context: Context,
   publicEndpoint: boolean = false,
-  printEvent: boolean = true): Promise<any> {
+  printEvent: boolean = true,
+  jwtSecret: string = "",
+  auth0ClientId: string = ""): Promise<any> {
 
   if (printEvent) {
     log.log("EVENT", "received new event", { "event": event })
@@ -32,7 +37,7 @@ export function handle(
         return action(inject, event, context)
       }
       else {
-        return action(inject, event, context, inject.userFromJwt(event.jwt))
+        return action(inject, event, context, JWT.getUser(jwtSecret, auth0ClientId, event.jwt))
       }
     })
     .catch((e: Error) => (e.name === "JsonWebTokenError" || e.name === "TokenExpiredError"), error => {

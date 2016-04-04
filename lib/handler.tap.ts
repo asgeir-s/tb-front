@@ -106,7 +106,7 @@ test("Handler:", (ot) => {
       } as any), true)
   })
 
-  ot.test("- for not public endpint; should not authenticate with fake JWT", (t) => {
+  ot.test("- for auth endpint; should not authenticate with fake JWT", (t) => {
     t.plan(4)
 
     handle(testAction,
@@ -139,7 +139,7 @@ test("Handler:", (ot) => {
       } as any), false)
   })
 
-  ot.test("- for not public endpint; should not authenticate with expired JWT", (t) => {
+  ot.test("- for auth endpint; should not authenticate with expired JWT", (t) => {
     t.plan(4)
 
     handle(testAction,
@@ -197,7 +197,7 @@ test("Handler:", (ot) => {
       } as any), true)
   })
 
-  ot.test("- for not public endpint; should authenticate with right JWT", (t) => {
+  ot.test("- for auth endpint; should authenticate with right JWT", (t) => {
     t.plan(2)
 
     handle(testAction,
@@ -214,9 +214,7 @@ test("Handler:", (ot) => {
         },
         "required": ["jwt", "name"]
       }
-      , {
-        userFromJwt: _.curry(JWT.getUser)(JWT_SECRET, AUTH0_CLIENT_ID)
-      }, {
+      , {}, {
         "name": "Asgeir",
         "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3RAZW1zaWwuY29tIiwidXNlcl9pZCI6IjEyMyIsImFwcF9tZXRhZGF0YSI6eyJzdHJlYW0tMTQ1NDI5MjE4MDI5MCI6ImVlMWNjMTRiLTNhZDYtNDg2OC05MjllLTYzNjVkMTcxN2U5YSIsInN0cmVhbS0xNDU0NzAzNjE3ODc2IjoiNTY4NDNiYTMtMDU4MS00YWJkLWJlMDUtNzZhZTM4MjA3Njg3In0sImlzcyI6InRyYWRlcnNiaXQuY29tIiwic3ViIjoidGVzdCIsImF1ZCI6InRydW1hbi5uZXQiLCJleHAiOjM0NTk2OTQ3NTgsImlhdCI6MTQ1NDI5MjE4MH0.D98TWRJp7l4yZ5_ovaNWN8xSnlBbwdEw5g6IXo7EH6c"
       }, ({
@@ -225,7 +223,7 @@ test("Handler:", (ot) => {
           t.equal(err, null)
           t.equal(res.user, "test@emsil.com", "should get the user correctly")
         }
-      } as any), false)
+      } as any), false, true, JWT_SECRET, AUTH0_CLIENT_ID)
   })
 
 })

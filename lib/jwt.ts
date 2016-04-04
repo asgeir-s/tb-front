@@ -6,9 +6,9 @@ export module JWT {
   /**
    * Throws exception if not valide
    */
-  export function getUser(secret: string, auth0ClientID: string, token: string): User {
+  export function getUser(secret: string, auth0ClientId: string, token: string): User {
     const options: VerifyOptions = {
-      audience: auth0ClientID,
+      audience: auth0ClientId,
       algorithms: ["HS256"]
     }
     const isStream = (value: string) => {

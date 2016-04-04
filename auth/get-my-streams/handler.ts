@@ -8,13 +8,24 @@ import { DynamoDb } from "../../lib/common/aws"
 import { GetMyStreams } from "./action"
 
 const publicEndpoint = false
+export const eventSchema: tv4.JsonSchema = {
+  "type": "object",
+  "properties": {
+    "jwt": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["jwt"]
+}
+
 const dynamoClient = DynamoDb.documentClientAsync(process.env.DYNAMO_REGION)
 
 const inject: GetMyStreams.Inject = {
-    getStreamsAuth: _.curry(Streams.getStreams)(dynamoClient, process.env.DYNAMO_TABLE_STREAMS, Streams.AuthLevel.Auth)
+  getStreamsAuth: _.curry(Streams.getStreams)(dynamoClient, process.env.DYNAMO_TABLE_STREAMS, Streams.AuthLevel.Auth)
 }
 
-
 export function handler(event: any, context: Context) {
-  handle(GetMyStreams.action, {}, inject, event, context, publicEndpoint)
+  handle(GetMyStreams.action, eventSchema, inject, event, context, publicEndpoint, true, process.env.JWT_USER_SECRET,
+    process.env.AUTH0_CLIENT_ID)
 }
