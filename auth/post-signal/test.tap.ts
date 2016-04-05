@@ -26,7 +26,11 @@ const event = require("./event.json")
 const dynamoClient = DynamoDb.documentClientAsync(DYNAMO_REGION)
 
 test("post-signal:", (ot) => {
-  ot.plan(5)
+  ot.plan(6)
+
+  const inject: PostSignal.Inject = {
+    postSignal: _.curry(Signals.postSignal)(SIGNAL_SERVICE_URL, SIGNAL_SERVICE_APIKEY)
+  }
 
   ot.test("closes any open position (if any) before test", (t) => {
     t.plan(1)
@@ -49,10 +53,6 @@ test("post-signal:", (ot) => {
   ot.test("- a valide signals should return the signal info", (t) => {
     t.plan(10)
 
-    const inject: PostSignal.Inject = {
-      postSignal: _.curry(Signals.postSignal)(SIGNAL_SERVICE_URL, SIGNAL_SERVICE_APIKEY)
-    }
-
     PostSignal.action(inject, event, <Context>{ awsRequestId: "test-request" },
       JWT.getUser(JWT_USER_SECRET, AUTH0_CLIENT_ID, event.jwt))
       .then(responds => {
@@ -73,10 +73,6 @@ test("post-signal:", (ot) => {
   ot.test("- should return 'duplicate', when the signal is the same as the last signal", (t) => {
     t.plan(3)
 
-    const inject: PostSignal.Inject = {
-      postSignal: _.curry(Signals.postSignal)(SIGNAL_SERVICE_URL, SIGNAL_SERVICE_APIKEY)
-    }
-
     PostSignal.action(inject, event, <Context>{ awsRequestId: "test-request" },
       JWT.getUser(JWT_USER_SECRET, AUTH0_CLIENT_ID, event.jwt))
       .then(responds => {
@@ -92,10 +88,6 @@ test("post-signal:", (ot) => {
 
     const newEvent = _.clone(event)
     newEvent.signal = -1
-
-    const inject: PostSignal.Inject = {
-      postSignal: _.curry(Signals.postSignal)(SIGNAL_SERVICE_URL, SIGNAL_SERVICE_APIKEY)
-    }
 
     PostSignal.action(inject, newEvent, <Context>{ awsRequestId: "test-request" },
       JWT.getUser(JWT_USER_SECRET, AUTH0_CLIENT_ID, event.jwt))
@@ -121,6 +113,22 @@ test("post-signal:", (ot) => {
         t.equal(_.has("changeInclFee", signals[1]), true, "should have the attribute")
         t.equal(_.has("value", signals[1]), true, "should have the attribute")
         t.equal(_.has("valueInclFee", signals[1]), true, "should have the attribute")
+      })
+  })
+
+  ot.test("- should not be able to operate on stream that the user is not the owner of", t => {
+    t.plan(3)
+
+    const newEvent = _.clone(event)
+    newEvent.streamId = "919408ee-920e-425b-a86e-687bf8adc50c"
+
+    PostSignal.action(inject, newEvent, <Context>{ awsRequestId: "test-request" },
+      JWT.getUser(JWT_USER_SECRET, AUTH0_CLIENT_ID, event.jwt))
+      .then(responds => {
+        t.equal(responds.success, false, "the request should NOT be succesfull")
+        t.equal(responds.data.indexOf("not the owner of this stream") > -1, true,
+          "should return message about 'not the owner of this stream'")
+        t.equal(responds.statusCode, 401, "should return Unauthorized statuscode")
       })
   })
 })

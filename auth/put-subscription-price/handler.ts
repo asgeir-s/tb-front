@@ -13,10 +13,12 @@ export const eventSchema: tv4.JsonSchema = {
   "type": "object",
   "properties": {
     "jwt": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?$"
     },
     "streamId": {
-      "type": "string"
+      "type": "string",
+      "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
     },
     "priceUsd": {
       "type": "number",

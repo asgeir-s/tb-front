@@ -13,25 +13,30 @@ export const eventSchema = {
   "type": "object",
   "properties": {
     "recaptcha": {
-      "type": "string"
+      "type": "string",
+      "pattern": "[0-9a-zA-Z_-]"
     },
     "subscription": {
       "type": "object",
       "properties": {
         "email": {
-          "type": "string"
+          "type": "string",
+          "pattern": "/.+@.+\..+/i"
         },
         "streamId": {
-          "type": "string"
+          "type": "string",
+          "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
         },
         "autoTrader": {
           "type": "boolean"
         },
         "apiKey": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?$"
         },
         "apiSecret": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?$"
         }
       },
       "additionalProperties": false,

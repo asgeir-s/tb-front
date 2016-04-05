@@ -26,7 +26,7 @@ const MAX_NUMBER_OF_STREAM = "3"
 const event = require("./event.json")
 
 test("post-stream:", (ot) => {
-  ot.plan(1)
+  ot.plan(2)
 
   ot.test("- test event schema", (t) => {
     t.plan(2)
@@ -35,9 +35,8 @@ test("post-stream:", (ot) => {
     t.equal(tv4.validate({ "field": "fake" }, eventSchema), false)
   })
 
-/** This test fails when the test user has three or more streams
-  ot.test("- should get name already taken when trying to add a stream with a already used name", (t) => {
-    t.plan(1)
+  ot.test("- should not be possible to add more then 'MAX NUMBER OF STREAMS' streams", (t) => {
+    t.plan(2)
 
     const inject: PostStream.Inject = {
       checkJwtIsUpToDate:
@@ -47,16 +46,40 @@ test("post-stream:", (ot) => {
       addStreamToAuth0UserReturnAppData:
       _.curry(Auth0.addStreamToAuth0UserReturnAppData)(AUTH0_URL, AUTH0_GET_USER_JWT),
       updateUserJwt: _.curry(JWT.updatedJwtWithNewAppData)(JWT_USER_SECRET),
-      maximumNumberOfStreamsPerUser: parseInt(MAX_NUMBER_OF_STREAM)
+      maximumNumberOfStreamsPerUser: 1
     }
 
     PostStream.action(inject, event, <Context>{ awsRequestId: "test-request" },
       JWT.getUser(JWT_SECRET, AUTH0_CLIENT_ID, event.jwt))
       .then(responds => {
-        t.equal(responds.statusCode, 409, "should retur statusCode 'Conflict'")
+        t.equal(responds.statusCode, 403, "should retur statusCode 'Forbidden'")
+        t.equal(responds.success, false, "should not be succesfull")
       })
 
   })
-  */
+
+  /** This test fails when the test user has three or more streams
+    ot.test("- should get name already taken when trying to add a stream with a already used name", (t) => {
+      t.plan(1)
+  
+      const inject: PostStream.Inject = {
+        checkJwtIsUpToDate:
+        _.curry(Auth0.checkUserAppMetadataUptodate)(AUTH0_URL, AUTH0_GET_USER_JWT),
+        postToStreamService:
+        _.curry(Streams.addNewStream)(STREAM_SERVICE_URL, STREAM_SERVICE_APIKEY),
+        addStreamToAuth0UserReturnAppData:
+        _.curry(Auth0.addStreamToAuth0UserReturnAppData)(AUTH0_URL, AUTH0_GET_USER_JWT),
+        updateUserJwt: _.curry(JWT.updatedJwtWithNewAppData)(JWT_USER_SECRET),
+        maximumNumberOfStreamsPerUser: parseInt(MAX_NUMBER_OF_STREAM)
+      }
+  
+      PostStream.action(inject, event, <Context>{ awsRequestId: "test-request" },
+        JWT.getUser(JWT_SECRET, AUTH0_CLIENT_ID, event.jwt))
+        .then(responds => {
+          t.equal(responds.statusCode, 409, "should retur statusCode 'Conflict'")
+        })
+  
+    })
+    */
 
 })

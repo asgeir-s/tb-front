@@ -23,7 +23,12 @@ const event = require("./event.json")
 const dynamoClient = DynamoDb.documentClientAsync(DYNAMO_REGION)
 
 test("get-api-key:", (ot) => {
-  ot.plan(2)
+  ot.plan(3)
+
+  const inject: GetApiKey.Inject = {
+    getApiKeyId: _.curry(Streams.getApiKeyId)(dynamoClient, DYNAMO_TABLE_STREAMS),
+    generateApiKey: _.curry(JWT.createApiKey)(JWT_USER_SECRET)
+  }
 
   ot.test("- test event schema", (t) => {
     t.plan(2)
@@ -32,20 +37,30 @@ test("get-api-key:", (ot) => {
     t.equal(tv4.validate({ "field": "fake" }, eventSchema), false)
   })
 
-
   ot.test("- should be able to get api key (jwt)", (t) => {
     t.plan(2)
-
-    const inject: GetApiKey.Inject = {
-      getApiKeyId: _.curry(Streams.getApiKeyId)(dynamoClient, DYNAMO_TABLE_STREAMS),
-      generateApiKey: _.curry(JWT.createApiKey)(JWT_USER_SECRET)
-    }
 
     GetApiKey.action(inject, event, <Context>{ awsRequestId: "test-request" },
       JWT.getUser(JWT_USER_SECRET, AUTH0_CLIENT_ID, event.jwt))
       .then(responds => {
         t.equal(responds.success, true, "the request should be succesfull")
         t.equal(responds.data.apiKey.length > 50, true, "should return an api key")
+      })
+  })
+
+  ot.test("- should not be able to operate on stream that the user is not the owner of", t => {
+    t.plan(3)
+
+    const newEvent = _.clone(event)
+    newEvent.streamId = "919408ee-920e-425b-a86e-687bf8adc50c"
+
+    GetApiKey.action(inject, newEvent, <Context>{ awsRequestId: "test-request" },
+      JWT.getUser(JWT_USER_SECRET, AUTH0_CLIENT_ID, event.jwt))
+      .then(responds => {
+        t.equal(responds.success, false, "the request should NOT be succesfull")
+        t.equal(responds.data.indexOf("not the owner of this stream") > -1, true,
+          "should return message about 'not the owner of this stream'")
+        t.equal(responds.statusCode, 401, "should return Unauthorized statuscode")
       })
   })
 

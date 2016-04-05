@@ -12,42 +12,43 @@ import { JWT } from "../../lib/jwt"
 
 const publicEndpoint = false
 export const eventSchema: tv4.JsonSchema = {
-  type: "object",
-  properties: {
-    jwt: {
-      type: "string"
+  "type": "object",
+  "properties": {
+    "jwt": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?$"
     },
-    stream: {
-      type: "object",
-      properties: {
-        name: {
-          type: "string",
-          pattern: "(?!.*  )[a-zA-Z0-9\\-\\_ ]{4,20}$"
+    "stream": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "(?!.*  )[a-zA-Z0-9\\-\\_ ]{4,20}$"
         },
-        exchange: {
-          type: "string",
-          pattern: "^[a-zA-Z1-9]{2,20}$"
+        "exchange": {
+          "type": "string",
+          "pattern": "^[a-zA-Z1-9]{2,20}$"
         },
-        currencyPair: {
-          type: "string",
-          pattern: "^btcUSD$"
+        "currencyPair": {
+          "type": "string",
+          "pattern": "^btcUSD$"
         },
-        payoutAddress: {
-          type: "string",
-          pattern: "^[13][a-km-zA-HJ-NP-Z0-9]{26,34}$"
+        "payoutAddress": {
+          "type": "string",
+          "pattern": "^[13][a-km-zA-HJ-NP-Z0-9]{26,34}$"
         },
-        subscriptionPriceUSD: {
-          type: "number",
-          minimum: 3,
-          maximum: 99999
+        "subscriptionPriceUSD": {
+          "type": "number",
+          "minimum": 3,
+          "maximum": 99999
         },
       },
-      additionalProperties: false,
-      required: ["name", "exchange", "currencyPair", "payoutAddress", "subscriptionPriceUSD"]
+      "additionalProperties": false,
+      "required": ["name", "exchange", "currencyPair", "payoutAddress", "subscriptionPriceUSD"]
     }
   },
-  additionalProperties: false,
-  required: ["jwt", "stream"]
+  "additionalProperties": false,
+  "required": ["jwt", "stream"]
 }
 
 const inject: PostStream.Inject = {

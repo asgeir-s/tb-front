@@ -2,7 +2,7 @@
   "name": "post-signal",
   "runtime": "nodejs",
   "description": "Serverless Lambda function for project: tb-front",
-  "customName": false,
+  "customName": "tb-front_auth_post-signal",
   "customRole": false,
   "handler": "handler.handler",
   "timeout": 6,
@@ -14,14 +14,17 @@
   "endpoints": [
     {
       "path": "post-signal",
-      "method": "GET",
+      "method": "POST",
       "type": "AWS",
-      "authorizationType": "none",
+      "authorizationType": "AWS_IAM",
       "authorizerFunction": false,
       "apiKeyRequired": false,
-      "requestParameters": {},
+      "requestParameters": {
+        "integration.request.path.integrationQueryParam": "method.request.path.streamId",
+        "integration.request.header.x-auth-token": "method.request.header.x-auth-token"
+      },
       "requestTemplates": {
-        "application/json": ""
+        "application/json": "{\"jwt\":\"$input.params('x-auth-token')\",\"streamId\": \"$util.urlDecode($input.params('streamId'))\", \"signal\": $input.json('$.signal')}"
       },
       "responses": {
         "400": {

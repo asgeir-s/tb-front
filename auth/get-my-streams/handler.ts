@@ -12,7 +12,8 @@ export const eventSchema: tv4.JsonSchema = {
   "type": "object",
   "properties": {
     "jwt": {
-      "type": "string"
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?$"
     }
   },
   "additionalProperties": false,
