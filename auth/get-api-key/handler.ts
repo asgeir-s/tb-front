@@ -29,7 +29,7 @@ const dynamoClient = DynamoDb.documentClientAsync(process.env.DYNAMO_REGION)
 
 const inject: GetApiKey.Inject = {
   getApiKeyId: _.curry(Streams.getApiKeyId)(dynamoClient, process.env.DYNAMO_TABLE_STREAMS),
-  generateApiKey: _.curry(JWT.createApiKey)(process.env.JWT_USER_SECRET)
+  generateApiKey: _.curry(JWT.createApiKey)(process.env.JWT_API_USER_SECRET)
 }
 
 export function handler(event: any, context: Context) {

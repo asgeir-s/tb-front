@@ -1,8 +1,8 @@
 {
-  "name": "post-signal",
+  "name": "api-post-signal",
   "runtime": "nodejs",
   "description": "Serverless Lambda function for project: tb-front",
-  "customName": "tb-front_auth_post-signal",
+  "customName":  "tb-front_auth_api-post-signal",
   "customRole": false,
   "handler": "handler.handler",
   "timeout": 6,
@@ -13,18 +13,18 @@
   },
   "endpoints": [
     {
-      "path": "post-signal",
-      "method": "POST",
+      "path": "api-post-signal",
+      "method": "GET",
       "type": "AWS",
-      "authorizationType": "AWS_IAM",
+      "authorizationType": "none",
       "authorizerFunction": false,
       "apiKeyRequired": false,
       "requestParameters": {
         "integration.request.path.integrationQueryParam": "method.request.path.streamId",
-        "integration.request.header.x-auth-token": "method.request.header.x-auth-token"
+        "integration.request.header.x-authorization": "method.request.header.x-authorization"
       },
       "requestTemplates": {
-        "application/json": "{\"jwt\":\"$input.params('x-auth-token')\",\"streamId\": \"$util.urlDecode($input.params('streamId'))\", \"signal\": $input.json('$.signal')}"
+        "application/json": "{\"apiKey\":\"$input.params('x-authorization')\",\"streamId\":\"$util.urlDecode($input.params('streamId'))\",\"tradeSignal\": $input.json('$')}"
       },
       "responses": {
         "400": {
@@ -46,10 +46,12 @@
     "SERVERLESS_PROJECT": "${project}",
     "SERVERLESS_STAGE": "${stage}",
     "SERVERLESS_REGION": "${region}",
-    "AUTH0_CLIENT_ID": "${auth0-client-id}",
-    "JWT_USER_SECRET": "${jwt-user-secret}",
     "SIGNAL_SERVICE_URL": "${serviceUrl-tbSignals}",
-    "SIGNAL_SERVICE_APIKEY": "${serviceApiKey-tbSignals}"
+    "SIGNAL_SERVICE_APIKEY": "${serviceApiKey-tbSignals}",
+    "DYNAMO_REGION": "${dynamo-region}",
+    "STREAMS_TABLE": "${dynamo-table-streams}",
+    "JWT_API_USER_SECRET": "${jwt-api-user-secret}",
+    "AUTH0_CLIENT_ID": "${auth0-client-id}"
   },
   "vpc": {
     "securityGroupIds": [],

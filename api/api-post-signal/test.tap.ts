@@ -8,8 +8,8 @@ import { Context } from "../../lib/common/typings/aws-lambda"
 import { handle } from "../../lib/handler"
 import { Streams } from "../../lib/common/streams"
 import { DynamoDb } from "../../lib/common/aws"
-import { PostSignal } from "./action"
-import { eventSchema } from "./handler"
+import { PostSignalApi } from "./action"
+import { handler, eventSchema } from "./handler"
 import { JWT } from "../../lib/jwt"
 import { Signals } from "../../lib/common/signals"
 
@@ -22,13 +22,16 @@ const SIGNAL_SERVICE_URL = "http://tb-staging-signals.elasticbeanstalk.com"
 const SIGNAL_SERVICE_APIKEY = "secret"
 
 const event = require("./event.json")
+const userId = "auth0|563c81e8ed40b21c524b86ea"
+const apiKeyId = "e11b4d83-0514-455b-9709-1b574bad4a77"
 
 const dynamoClient = DynamoDb.documentClientAsync(DYNAMO_REGION)
 
 test("post-signal:", (ot) => {
-  ot.plan(6)
+  ot.plan(5)
 
-  const inject: PostSignal.Inject = {
+  const inject: PostSignalApi.Inject = {
+    getStreamPrivete: _.curry(Streams.getStream)(dynamoClient, DYNAMO_TABLE_STREAMS, Streams.AuthLevel.Private),
     postSignal: _.curry(Signals.postSignal)(SIGNAL_SERVICE_URL, SIGNAL_SERVICE_APIKEY)
   }
 
@@ -50,11 +53,10 @@ test("post-signal:", (ot) => {
     t.equal(tv4.validate({ "field": "fake" }, eventSchema), false)
   })
 
-  ot.test("- a valide signals should return the signal info", (t) => {
+  ot.test("- should return 'duplicate', when the signal is the same as the last signal", (t) => {
     t.plan(10)
 
-    PostSignal.action(inject, event, <Context>{ awsRequestId: "test-request" },
-      JWT.getUser(JWT_USER_SECRET, AUTH0_CLIENT_ID, event.jwt))
+    PostSignalApi.action(inject, event, <Context>{ awsRequestId: "test-request" }, userId, apiKeyId)
       .then(responds => {
         const signals = responds.data
         t.equal(signals.length, 1, "should return one signal")
@@ -73,8 +75,7 @@ test("post-signal:", (ot) => {
   ot.test("- should return 'duplicate', when the signal is the same as the last signal", (t) => {
     t.plan(3)
 
-    PostSignal.action(inject, event, <Context>{ awsRequestId: "test-request" },
-      JWT.getUser(JWT_USER_SECRET, AUTH0_CLIENT_ID, event.jwt))
+    PostSignalApi.action(inject, event, <Context>{ awsRequestId: "test-request" }, userId, apiKeyId)
       .then(responds => {
         t.equal(responds.statusCode, 409, "should returne statusCode 409")
         t.equal(responds.success, false, "should not be succesfull")
@@ -82,15 +83,13 @@ test("post-signal:", (ot) => {
       })
   })
 
-
   ot.test("- a valide 'reverse position' signals should return the signal info", (t) => {
     t.plan(19)
 
     const newEvent = _.clone(event)
-    newEvent.signal = -1
+    newEvent.tradeSignal = -1
 
-    PostSignal.action(inject, newEvent, <Context>{ awsRequestId: "test-request" },
-      JWT.getUser(JWT_USER_SECRET, AUTH0_CLIENT_ID, event.jwt))
+    PostSignalApi.action(inject, newEvent, <Context>{ awsRequestId: "test-request" }, userId, apiKeyId)
       .then(responds => {
         const signals = responds.data
         t.equal(signals.length, 2, "should return two signal")
@@ -116,19 +115,4 @@ test("post-signal:", (ot) => {
       })
   })
 
-  ot.test("- should not be able to operate on stream that the user is not the owner of", t => {
-    t.plan(3)
-
-    const newEvent = _.clone(event)
-    newEvent.streamId = "919408ee-920e-425b-a86e-687bf8adc50c"
-
-    PostSignal.action(inject, newEvent, <Context>{ awsRequestId: "test-request" },
-      JWT.getUser(JWT_USER_SECRET, AUTH0_CLIENT_ID, event.jwt))
-      .then(responds => {
-        t.equal(responds.success, false, "the request should NOT be succesfull")
-        t.equal(responds.data.indexOf("not the owner of this stream") > -1, true,
-          "should return message about 'not the owner of this stream'")
-        t.equal(responds.statusCode, 401, "should return Unauthorized statuscode")
-      })
-  })
 })

@@ -49,7 +49,8 @@
     "DYNAMO_REGION": "${dynamo-region}",
     "DYNAMO_TABLE_STREAMS": "${dynamo-table-streams}",
     "AUTH0_CLIENT_ID": "${auth0-client-id}",
-    "JWT_USER_SECRET": "${jwt-user-secret}"
+    "JWT_USER_SECRET": "${jwt-user-secret}",
+    "JWT_API_USER_SECRET": "${jwt-api-user-secret}"
   },
   "vpc": {
     "securityGroupIds": [],
