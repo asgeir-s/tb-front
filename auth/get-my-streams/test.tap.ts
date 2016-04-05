@@ -22,7 +22,7 @@ const event = require("./event.json")
 
 const dynamoClient = DynamoDb.documentClientAsync(DYNAMO_REGION)
 
-test("get-streams:", (ot) => {
+test("get-my-streams:", (ot) => {
   ot.plan(2)
 
   ot.test("- test event schema", (t) => {
