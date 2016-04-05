@@ -5,6 +5,7 @@ import * as _ from "ramda"
 import { Stream, Stats, StreamPrivate } from "./typings/stream"
 import { Signal } from "./typings/signal"
 import { NewStreamRequest } from "../../lib/typings/new-stream-request"
+import { guid } from "./guid"
 
 const requestAsync = Promise.promisify(request)
 
@@ -199,7 +200,21 @@ export module Streams {
         signal: getJsonField("signal", json)
       }
     }
+  }
 
+  export function getApiKeyId(documentClient: any, streamTableName: string, streamId: string): Promise<string> {
+    const apiKeyId = guid()
+    return documentClient.updateAsync({
+      "Key": { "id": streamId },
+      "TableName": streamTableName,
+      "AttributeUpdates": {
+        "apiKeyId": {
+          "Action": "PUT",
+          "Value": apiKeyId
+        }
+      },
+      "ReturnValues": "UPDATED_NEW"
+    }).then((res: any) => res.Attributes.apiKeyId)
   }
 
 

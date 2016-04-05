@@ -1,8 +1,8 @@
 {
-  "name": "post-stream",
+  "name": "get-api-key",
   "runtime": "nodejs",
   "description": "Serverless Lambda function for project: tb-front",
-  "customName": "tb-front_auth_post-stream",
+  "customName": "tb-front_auth_get-api-key",
   "customRole": false,
   "handler": "handler.handler",
   "timeout": 6,
@@ -13,17 +13,18 @@
   },
   "endpoints": [
     {
-      "path": "me/streams",
-      "method": "POST",
+      "path": "me/streams/{streamId}/apikey",
+      "method": "GET",
       "type": "AWS",
       "authorizationType": "AWS_IAM",
       "authorizerFunction": false,
       "apiKeyRequired": false,
       "requestParameters": {
+        "integration.request.path.integrationQueryParam": "method.request.path.streamId",
         "integration.request.header.x-auth-token": "method.request.header.x-auth-token"
       },
       "requestTemplates": {
-        "application/json": "{\"jwt\":\"$input.params('x-auth-token')\",\"stream\": $input.json('$')}"
+        "application/json": "{\"jwt\":\"$input.params('x-auth-token')\",\"streamId\":\"$util.urlDecode($input.params('streamId'))\"}"
       },
       "responses": {
         "400": {
@@ -45,12 +46,10 @@
     "SERVERLESS_PROJECT": "${project}",
     "SERVERLESS_STAGE": "${stage}",
     "SERVERLESS_REGION": "${region}",
-    "AUTH0_URL": "${auth0-url}",
-    "AUTH0_GET_USER_JWT": "${auth0-jwt-secret}",
-    "STREAM_SERVICE_URL": "${serviceUrl-tbStreams}",
-    "STREAM_SERVICE_APIKEY": "${serviceApiKey-tbStreams}",
-    "JWT_USER_SECRET": "${jwt-user-secret}",
-    "MAX_NUMBER_OF_STREAM": "${max-number-of-streams}"
+    "DYNAMO_REGION": "${dynamo-region}",
+    "DYNAMO_TABLE_STREAMS": "${dynamo-table-streams}",
+    "AUTH0_CLIENT_ID": "${auth0-client-id}",
+    "JWT_USER_SECRET": "${jwt-user-secret}"
   },
   "vpc": {
     "securityGroupIds": [],

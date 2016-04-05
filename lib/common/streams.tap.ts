@@ -8,17 +8,20 @@ import { guid } from "./guid"
 
 
 test("Streams.getStream:", (ot) => {
-  ot.plan(7)
+  ot.plan(8)
 
   const DYNAMO_REGION = "us-west-2"
 
   const databaseCli = DynamoDb.documentClientAsync(DYNAMO_REGION)
   const timestamp = new Date().getTime()
+  const streamsTableName = "streams-staging"
+
+  let streamId: string
 
   ot.test("- should be able to get Public stream info", (t) => {
     t.plan(10)
 
-    Streams.getStream(databaseCli, "streams-staging", Streams.AuthLevel.Public,
+    Streams.getStream(databaseCli, streamsTableName, Streams.AuthLevel.Public,
       "43a2cfb3-6026-4a85-b3ab-2468f7d963aa")
       .then((stream) => {
         t.equal(_.has("lastSignal", stream), false, "should not return auth fields")
@@ -38,7 +41,7 @@ test("Streams.getStream:", (ot) => {
   ot.test("- BATCH GET", (t) => {
     t.plan(10)
 
-    Streams.getStreams(databaseCli, "streams-staging", Streams.AuthLevel.Public,
+    Streams.getStreams(databaseCli, streamsTableName, Streams.AuthLevel.Public,
       ["43a2cfb3-6026-4a85-b3ab-2468f7d963aa"])
       .then((streamArray) => {
         const stream = streamArray[0]
@@ -59,7 +62,7 @@ test("Streams.getStream:", (ot) => {
   ot.test("- when stream is not found should return undefined", (t) => {
     t.plan(1)
 
-    Streams.getStream(databaseCli, "streams-staging", Streams.AuthLevel.Public,
+    Streams.getStream(databaseCli, streamsTableName, Streams.AuthLevel.Public,
       "not-real")
       .then((stream) => {
         t.equal(stream, undefined, "should not return undefined")
@@ -69,7 +72,7 @@ test("Streams.getStream:", (ot) => {
   ot.test("- should be able to get Auth stream info", (t) => {
     t.plan(10)
 
-    Streams.getStream(databaseCli, "streams-staging", Streams.AuthLevel.Auth,
+    Streams.getStream(databaseCli, streamsTableName, Streams.AuthLevel.Auth,
       "43a2cfb3-6026-4a85-b3ab-2468f7d963aa")
       .then((stream) => {
         t.equal(_.has("streamPrivate", stream), false, "should not return private fields")
@@ -89,7 +92,7 @@ test("Streams.getStream:", (ot) => {
   ot.test("- should be able to get Private stream info", (t) => {
     t.plan(10)
 
-    Streams.getStream(databaseCli, "streams-staging", Streams.AuthLevel.Private,
+    Streams.getStream(databaseCli, streamsTableName, Streams.AuthLevel.Private,
       "43a2cfb3-6026-4a85-b3ab-2468f7d963aa")
       .then((stream) => {
         t.equal(_.has("streamPrivate", stream), true, "should return private fields")
@@ -122,6 +125,7 @@ test("Streams.getStream:", (ot) => {
 
     Streams.addNewStream(STREAM_SERVICE_URL, STREAM_SERVICE_APIKEY, "test-GRID", newStreamRequest)
       .then(newStreamId => {
+        streamId = newStreamId
         t.equal(newStreamId.length > 10, true, "should return the new streamId")
       })
       .then(() => {
@@ -136,10 +140,7 @@ test("Streams.getStream:", (ot) => {
   ot.test("- should get Streams.getAllStremsPublic: ", (t) => {
     t.plan(30)
 
-    const databaseCli = DynamoDb.documentClientAsync("us-west-2")
-    const timestamp = new Date().getTime()
-
-    Streams.getAllStremsPublic(databaseCli, "streams-staging")
+    Streams.getAllStremsPublic(databaseCli, streamsTableName)
       .then((streams) => {
         _.take(3, streams).map((stream) => {
           t.equal(_.has("lastSignal", stream), false, "should not return auth fields")
@@ -155,6 +156,15 @@ test("Streams.getStream:", (ot) => {
           t.equal(_.has("id", stream), true, "should return public fields")
         }
         )
+      })
+  })
+
+  ot.test("- should be possible to getApiKeyId", (t) => {
+    t.plan(1)
+
+    Streams.getApiKeyId(databaseCli, streamsTableName, streamId)
+      .then(apiKeyId => {
+        t.equal(apiKeyId.length > 12, true, "should return a apiKeyId")
       })
   })
 })
