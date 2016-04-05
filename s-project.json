@@ -1,4 +1,19 @@
 {
   "name": "tb-front",
-  "custom": {}
+  "custom": {
+    "cors": {
+      "allowOrigin": "${cors-allow-origin}",
+      "allowHeaders": [
+        "Content-Type",
+        "X-Amz-Date",
+        "Authorization",
+        "X-Api-Key",
+        "x-amz-security-token",
+        "x-auth-token"
+      ]
+    }
+  },
+  "plugins": [
+    "serverless-cors-plugin"
+  ]
 }

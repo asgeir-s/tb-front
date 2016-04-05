@@ -4,7 +4,7 @@
   "description": "Serverless Lambda function for project: tb-front",
   "customName": "tb-front_auth_get-api-key",
   "customRole": false,
-  "handler": "handler.handler",
+  "handler": "auth/get-api-key/handler.handler",
   "timeout": 6,
   "memorySize": 1024,
   "authorizer": {},

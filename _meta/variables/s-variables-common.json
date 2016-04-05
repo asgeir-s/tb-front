@@ -2,6 +2,7 @@
   "project": "tb-front",
   "dynamo-table-streams": "streams-staging",
   "dynamo-region": "us-west-2",
+  "cors-allow-origin": "*",
   "serviceUrl-tbSignals": "http://tb-staging-signals.elasticbeanstalk.com",
   "serviceApiKey-tbSignals": "secret",
   "serviceUrl-tbStreams": "http://tb-staging-streams.elasticbeanstalk.com",

@@ -4,7 +4,7 @@
   "description": "Serverless Lambda function for project: tb-front",
   "customName": "tb-front_auth_get-my-streams",
   "customRole": false,
-  "handler": "handler.handler",
+  "handler": "auth/get-my-streams/handler.handler",
   "timeout": 6,
   "memorySize": 1024,
   "authorizer": {},
