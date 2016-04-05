@@ -27,7 +27,7 @@ const apiKeyId = "e11b4d83-0514-455b-9709-1b574bad4a77"
 
 const dynamoClient = DynamoDb.documentClientAsync(DYNAMO_REGION)
 
-test("post-signal:", (ot) => {
+test("post-signal-api:", (ot) => {
   ot.plan(5)
 
   const inject: PostSignalApi.Inject = {
