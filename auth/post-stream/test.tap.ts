@@ -26,7 +26,7 @@ const MAX_NUMBER_OF_STREAM = "3"
 const event = require("./event.json")
 
 test("post-stream:", (ot) => {
-  ot.plan(2)
+  ot.plan(1)
 
   ot.test("- test event schema", (t) => {
     t.plan(2)
