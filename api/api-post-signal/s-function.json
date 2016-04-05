@@ -2,7 +2,7 @@
   "name": "api-post-signal",
   "runtime": "nodejs",
   "description": "Serverless Lambda function for project: tb-front",
-  "customName":  "tb-front_auth_api-post-signal",
+  "customName": "tb-front_auth_api-post-signal",
   "customRole": false,
   "handler": "api/api-post-signal/handler.handler",
   "timeout": 6,
@@ -13,8 +13,8 @@
   },
   "endpoints": [
     {
-      "path": "api-post-signal",
-      "method": "GET",
+      "path": "api/streams/{streamId}/signal",
+      "method": "POST",
       "type": "AWS",
       "authorizationType": "none",
       "authorizerFunction": false,
@@ -27,8 +27,11 @@
         "application/json": "{\"apiKey\":\"$input.params('x-authorization')\",\"streamId\":\"$util.urlDecode($input.params('streamId'))\",\"tradeSignal\": $input.json('$')}"
       },
       "responses": {
-        "400": {
-          "statusCode": "400"
+        ".*\\\"statusCode\\\":409.*": {
+          "statusCode": "409",
+          "responseTemplates": {
+            "application/json": "$input.json('$.errorMessage')"
+          }
         },
         "default": {
           "statusCode": "200",

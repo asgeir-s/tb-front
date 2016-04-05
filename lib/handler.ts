@@ -86,7 +86,7 @@ export function handle(
           "success": result.success,
           "statusCode": result.statusCode
         })
-        context.done(result, null)
+        context.done(JSON.stringify(result), null)
       }
     })
 

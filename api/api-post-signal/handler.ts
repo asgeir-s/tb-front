@@ -113,7 +113,7 @@ export function handler(event: any, context: Context) {
           "success": result.success,
           "statusCode": result.statusCode
         })
-        context.done(result, null)
+        context.done(JSON.stringify(result), null)
       }
     })
 }

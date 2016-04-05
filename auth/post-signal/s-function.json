@@ -13,7 +13,7 @@
   },
   "endpoints": [
     {
-      "path": "post-signal",
+      "path": "me/streams/{streamId}/signal",
       "method": "POST",
       "type": "AWS",
       "authorizationType": "AWS_IAM",

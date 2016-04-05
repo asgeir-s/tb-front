@@ -13,7 +13,7 @@
   },
   "endpoints": [
     {
-      "path": "put-subscription-price",
+      "path": "me/streams/{streamId}/subscription-price",
       "method": "PUT",
       "type": "AWS",
       "authorizationType": "AWS_IAM",
