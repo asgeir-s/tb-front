@@ -217,36 +217,52 @@ export module Streams {
     }).then((res: any) => res.Attributes.apiKeyId)
   }
 
-
-  // legacy:
-
-
-  /**
-   * returns the new streamId
-   */
-  export function addNewStream(streamServiceUrl: string, streamServiceApiKey: string, GRID: string,
-    newStreamRequest: NewStreamRequest): Promise<string> {
-    return requestAsync({
-      method: "POST",
-      uri: streamServiceUrl + "/streams",
-      headers: {
-        "Global-Request-ID": GRID,
-        "content-type": "application/json",
-        "Authorization": "apikey " + streamServiceApiKey
+/**
+ * returns the updated subscriptionPriceUSD
+ */
+  export function updateSubscriptionPrice(documentClient: any, streamTableName: string, streamId: string,
+    newSubscriptionPrice: number): Promise<number> {
+    return documentClient.updateAsync({
+      "Key": { "id": streamId },
+      "TableName": streamTableName,
+      "AttributeUpdates": {
+        "subscriptionPriceUSD": {
+          "Action": "PUT",
+          "Value": newSubscriptionPrice
+        }
       },
-      body: newStreamRequest,
-      json: true
-    })
-      .then((res: any) => {
-        if (res.statusCode === 409) {
-          throw new Error("A stream with this name already exists.")
-        }
-        else if (res.statusCode < 200 || res.statusCode >= 300) {
-          throw new Error(JSON.stringify(res))
-        }
-        else {
-          return res.body.id
-        }
-      })
+      "ReturnValues": "UPDATED_NEW"
+    }).then((res: any) => res.Attributes.subscriptionPriceUSD)
   }
+
+// legacy:
+
+/**
+ * returns the new streamId
+ */
+export function addNewStream(streamServiceUrl: string, streamServiceApiKey: string, GRID: string,
+  newStreamRequest: NewStreamRequest): Promise<string> {
+  return requestAsync({
+    method: "POST",
+    uri: streamServiceUrl + "/streams",
+    headers: {
+      "Global-Request-ID": GRID,
+      "content-type": "application/json",
+      "Authorization": "apikey " + streamServiceApiKey
+    },
+    body: newStreamRequest,
+    json: true
+  })
+    .then((res: any) => {
+      if (res.statusCode === 409) {
+        throw new Error("A stream with this name already exists.")
+      }
+      else if (res.statusCode < 200 || res.statusCode >= 300) {
+        throw new Error(JSON.stringify(res))
+      }
+      else {
+        return res.body.id
+      }
+    })
+}
 }

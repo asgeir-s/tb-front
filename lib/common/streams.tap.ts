@@ -8,7 +8,7 @@ import { guid } from "./guid"
 
 
 test("Streams.getStream:", (ot) => {
-  ot.plan(8)
+  ot.plan(9)
 
   const DYNAMO_REGION = "us-west-2"
 
@@ -165,6 +165,16 @@ test("Streams.getStream:", (ot) => {
     Streams.getApiKeyId(databaseCli, streamsTableName, streamId)
       .then(apiKeyId => {
         t.equal(apiKeyId.length > 12, true, "should return a apiKeyId")
+      })
+  })
+
+
+  ot.test("- should be possible to update the subscription price", (t) => {
+    t.plan(1)
+
+    Streams.updateSubscriptionPrice(databaseCli, streamsTableName, streamId, 4)
+      .then(subscriptionPriceUSD => {
+        t.equal(subscriptionPriceUSD, 4, "should return the new subscription price")
       })
   })
 })

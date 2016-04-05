@@ -1,0 +1,58 @@
+{
+  "name": "put-subscription-price",
+  "runtime": "nodejs",
+  "description": "Serverless Lambda function for project: tb-front",
+  "customName": "tb-front_auth_put-subscription-price",
+  "customRole": false,
+  "handler": "handler.handler",
+  "timeout": 6,
+  "memorySize": 1024,
+  "authorizer": {},
+  "custom": {
+    "excludePatterns": []
+  },
+  "endpoints": [
+    {
+      "path": "put-subscription-price",
+      "method": "PUT",
+      "type": "AWS",
+      "authorizationType": "AWS_IAM",
+      "authorizerFunction": false,
+      "apiKeyRequired": false,
+      "requestParameters": {
+        "integration.request.path.integrationQueryParam": "method.request.path.streamId",
+        "integration.request.header.x-auth-token": "method.request.header.x-auth-token"
+      },
+      "requestTemplates": {
+        "application/json": "{\"jwt\":\"$input.params('x-auth-token')\",\"streamId\": \"$util.urlDecode($input.params('streamId'))\",\"priceUsd\": $input.json('$.priceUsd')}"
+      },
+      "responses": {
+        "400": {
+          "statusCode": "400"
+        },
+        "default": {
+          "statusCode": "200",
+          "responseParameters": {},
+          "responseModels": {},
+          "responseTemplates": {
+            "application/json": ""
+          }
+        }
+      }
+    }
+  ],
+  "events": [],
+  "environment": {
+    "SERVERLESS_PROJECT": "${project}",
+    "SERVERLESS_STAGE": "${stage}",
+    "SERVERLESS_REGION": "${region}",
+    "DYNAMO_REGION": "${dynamo-region}",
+    "DYNAMO_TABLE_STREAMS": "${dynamo-table-streams}",
+    "AUTH0_CLIENT_ID": "${auth0-client-id}",
+    "JWT_USER_SECRET": "${jwt-user-secret}"
+  },
+  "vpc": {
+    "securityGroupIds": [],
+    "subnetIds": []
+  }
+}
