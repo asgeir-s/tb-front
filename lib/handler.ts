@@ -80,7 +80,12 @@ export function handle(
         context.done(null, result.data)
       }
       else {
-        log.log("RESULT", "FAILE: returning result-object", { "result": result })
+        log.log("RESULT", "FAILURE: returning result", {
+          "GRID": result.GRID,
+          "data": result.data,
+          "success": result.success,
+          "statusCode": result.statusCode
+        })
         context.done(result, null)
       }
     })

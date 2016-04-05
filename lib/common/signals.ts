@@ -48,4 +48,33 @@ export module Signals {
       }
     })
   }
+
+  /**
+   * Returns the created signal (with all 'Signal' attributes)
+   */
+  export function postSignal(signalServiceUrl: string, signalServiceApiKey: string, GRID: string,
+    streamId: string, signal: number): Promise<Array<Signal>> {
+    return requestAsync({
+      method: "POST",
+      uri: signalServiceUrl + "/streams/" + streamId + "/signals",
+      headers: {
+        "Global-Request-ID": GRID,
+        "content-type": "application/json",
+        "Authorization": "apikey " + signalServiceApiKey
+      },
+      body: signal,
+      json: true
+    }).then((res: any) => {
+      if (res.statusCode === 409) {
+        throw new Error("duplicate")
+      }
+      else if (res.statusCode < 200 || res.statusCode >= 300) {
+        throw new Error(res.body)
+      }
+      else {
+        return res.body
+      }
+    })
+
+  }
 }
