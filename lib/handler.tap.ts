@@ -34,7 +34,7 @@ test("Handler:", (ot) => {
   }
 
   ot.test("- for public endpint; should reject invalide event event", (t) => {
-    t.plan(4)
+    t.plan(3)
 
     handle(testAction,
       {
@@ -50,16 +50,16 @@ test("Handler:", (ot) => {
       , {}, {}, ({
         awsRequestId: "test-grid",
         done: (err: any, res: any) => {
-          t.equal(res, null)
-          t.equal(err.success, false, "should not be succesfull")
-          t.equal(err.statusCode, 400, "return 'bad request' statusCode")
-          t.equal(err.GRID, "test-grid", "should not be succesfull")
+          t.equal(res, null, "should return an error")
+          t.equal(err.indexOf("400") > -1, true, "return 'bad request' statusCode")
+          t.equal(err.indexOf("test-grid") > -1, true,
+            "should return the GRID that is returned when testAction does not run")
         }
       } as any), true)
   })
 
-  ot.test("- for public endpint; should reject when unvalide schema", (t) => {
-    t.plan(4)
+  ot.test("- for public endpint; should reject when invalide schema", (t) => {
+    t.plan(3)
 
     handle(testAction,
       {
@@ -75,10 +75,10 @@ test("Handler:", (ot) => {
       , {}, {}, ({
         awsRequestId: "test-grid",
         done: (err: any, res: any) => {
-          t.equal(res, null)
-          t.equal(err.success, false, "should not be succesfull")
-          t.equal(err.statusCode, 400, "return 'bad request' statusCode")
-          t.equal(err.GRID, "test-grid", "should return the GRID that is returned when testAction does not run")
+          t.equal(res, null, "should return an error")
+          t.equal(err.indexOf("400") > -1, true, "return 'bad request' statusCode")
+          t.equal(err.indexOf("test-grid") > -1, true,
+            "should return the GRID that is returned when testAction does not run")
         }
       } as any), true)
   })
@@ -100,14 +100,14 @@ test("Handler:", (ot) => {
       , {}, { "name": "Asgeir" }, ({
         awsRequestId: "test-grid",
         done: (err: any, res: any) => {
-          t.equal(err, null)
+          t.equal(err, null, "should not return an error")
           t.deepEqual(res, { "user": "" }, "should be succesfull")
         }
       } as any), true)
   })
 
   ot.test("- for auth endpint; should not authenticate with fake JWT", (t) => {
-    t.plan(4)
+    t.plan(3)
 
     handle(testAction,
       {
@@ -131,16 +131,16 @@ test("Handler:", (ot) => {
       }, ({
         awsRequestId: "test-grid",
         done: (err: any, res: any) => {
-          t.equal(res, null)
-          t.equal(err.success, false, "should not be succesfull")
-          t.equal(err.statusCode, 403, "should return unautorized statusCode")
-          t.equal(err.GRID, "test-grid", "should return the GRID that is returned when testAction does not run")
+          t.equal(res, null, "should return an error")
+          t.equal(err.indexOf("403") > -1, true, "should return unautorized statusCode")
+          t.equal(err.indexOf("test-grid") > -1, true,
+            "should return the GRID that is returned when testAction does not run")
         }
       } as any), false)
   })
 
   ot.test("- for auth endpint; should not authenticate with expired JWT", (t) => {
-    t.plan(4)
+    t.plan(3)
 
     handle(testAction,
       {
@@ -164,16 +164,16 @@ test("Handler:", (ot) => {
       }, ({
         awsRequestId: "test-grid",
         done: (err: any, res: any) => {
-          t.equal(res, null)
-          t.equal(err.success, false, "should not be succesfull")
-          t.equal(err.statusCode, 403, "should return unautorized statusCode")
-          t.equal(err.GRID, "test-grid", "should return the GRID that is returned when testAction does not run")
+          t.equal(res, null, "should return an error")
+          t.equal(err.indexOf("403") > -1, true, "should return unautorized statusCode")
+          t.equal(err.indexOf("test-grid") > -1, true,
+            "should return the GRID that is returned when testAction does not run")
         }
       } as any), false)
   })
 
   ot.test("- for public endpint; should return internal server error when the action throws an error", (t) => {
-    t.plan(4)
+    t.plan(3)
 
     handle(testActionThrow,
       {
@@ -189,10 +189,10 @@ test("Handler:", (ot) => {
       , {}, { "name": "Asgeir" }, ({
         awsRequestId: "test-grid",
         done: (err: any, res: any) => {
-          t.equal(res, null)
-          t.equal(err.success, false, "should not be succesfull")
-          t.equal(err.statusCode, 500, "should return 'internal server error' statusCode")
-          t.equal(err.GRID, "test-grid", "should return the GRID that is returned when testAction does not run")
+          t.equal(res, null, "should return an error")
+          t.equal(err.indexOf("500") > -1, true, "should return 'internal server error' statusCode")
+          t.equal(err.indexOf("test-grid") > -1, true,
+            "should return the GRID that is returned when testAction does not run")
         }
       } as any), true)
   })
