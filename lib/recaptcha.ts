@@ -1,3 +1,4 @@
+import * as Promise from "bluebird"
 import * as request from "request"
 
 export module Recaptcha {

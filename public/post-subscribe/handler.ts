@@ -1,4 +1,5 @@
 import * as _ from "ramda"
+import * as Promise from "bluebird"
 
 import { Context } from "../../lib/common//typings/aws-lambda"
 import { handle } from "../../lib/handler"

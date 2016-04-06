@@ -1,17 +1,8 @@
 {
   "project": "tb-front",
-  "dynamo-table-streams": "streams-staging",
-  "dynamo-region": "us-west-2",
-  "cors-allow-origin": "*",
-  "serviceUrl-tbSignals": "http://tb-staging-signals.elasticbeanstalk.com",
-  "serviceApiKey-tbSignals": "secret",
-  "serviceUrl-tbStreams": "http://tb-staging-streams.elasticbeanstalk.com",
-  "serviceApiKey-tbStreams": "secret",
-  "url-tb-back": "https://86jxkw20u2.execute-api.us-west-2.amazonaws.com/dev/",
   "auth0-url": "https://cluda.auth0.com",
-  "auth0-client-id": "2wW6lKZgFSxjqlHgqUydE9gtkLzt6H4h",
+  "auth0-client-id": "7VNS2Tc2IiQB2PvjUBcb5744qH9eY7iB",
   "auth0-jwt-secret": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJLbW8xMFFHcENPeEtIRFg2VEhKQzJzWmJlWEpYMktDbiIsInNjb3BlcyI6eyJ1c2Vyc19hcHBfbWV0YWRhdGEiOnsiYWN0aW9ucyI6WyJ1cGRhdGUiXX0sInVzZXJzIjp7ImFjdGlvbnMiOlsicmVhZCJdfX0sImlhdCI6MTQ1NDUxODQ4NywianRpIjoiMWMxZTkxNjA3ODY3ZTEyYTEwZmQ2OTVjZTYxZWYwNDgifQ.xwh6dCyidm-nxd2Q6YAZcW7K-xQvLIlZQoIHkxSOGb4",
-  "jwt-user-secret": "jwt-secret",
-  "jwt-api-user-secret": "jwt-secret",
+  "jwt-user-secret": "w5CfEVM5uDazi8fQAUdjbKdhRrFdC1jFIUwTelZaPO_d5O3dI886-n00XcLUWbB1",
   "max-number-of-streams": "3"
 }

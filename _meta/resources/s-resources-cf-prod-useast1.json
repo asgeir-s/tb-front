@@ -27,7 +27,7 @@
     "IamPolicyLambda": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
-        "PolicyName": "${stage}-${project}-lambda",
+        "PolicyName": "prod-tb-front-lambda",
         "PolicyDocument": {
           "Version": "2012-10-17",
           "Statement": [
@@ -38,7 +38,7 @@
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
               ],
-              "Resource": "arn:aws:logs:${region}:*:*"
+              "Resource": "arn:aws:logs:us-east-1:*:*"
             },
             {
               "Effect": "Allow",
@@ -53,7 +53,7 @@
                 "dynamodb:BatchGetItem",
                 "dynamodb:UpdateItem"
               ],
-              "Resource": "arn:aws:dynamodb:${region}:*:*"
+              "Resource": "arn:aws:dynamodb:us-east-1:*:*"
             }
           ]
         },

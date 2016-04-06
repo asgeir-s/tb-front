@@ -9,7 +9,8 @@
         "Authorization",
         "X-Api-Key",
         "x-amz-security-token",
-        "x-auth-token"
+        "x-auth-token",
+        "x-re-captcha"
       ]
     }
   },
