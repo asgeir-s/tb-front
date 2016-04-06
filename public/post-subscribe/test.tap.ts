@@ -14,7 +14,7 @@ import { Signals } from "../../lib/common/signals"
 import { Subscription } from "../../lib/common/subscription"
 
 
-const TB_BACK_URL = "https://86jxkw20u2.execute-api.us-west-2.amazonaws.com/dev/"
+const TB_BACK_URL = "https://86jxkw20u2.execute-api.us-west-2.amazonaws.com/dev"
 
 const event = require("./event.json")
 

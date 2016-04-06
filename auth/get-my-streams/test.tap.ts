@@ -18,7 +18,9 @@ const DYNAMO_TABLE_STREAMS = "streams-staging"
 const JWT_SECRET = "jwt-secret"
 const AUTH0_CLIENT_ID = "2wW6lKZgFSxjqlHgqUydE9gtkLzt6H4h"
 
-const event = require("./event.json")
+const event = {
+    "jwt": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYXV0aDB8NTZiMjMwMjBmOTcxYjE2MjA1NTY0MGMzIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJhcHBfbWV0YWRhdGEiOnsic3RyZWFtLTE0NTQ1Mjg5MDgxODYiOiIwOTY4NmM4MC0zMGZjLTRjODUtODQwMy0yNzIxZTkyOGNlNWYifSwiaXNzIjoiaHR0cHM6Ly9jbHVkYS5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NTZiMjMwMjBmOTcxYjE2MjA1NTY0MGMzIiwiYXVkIjoiMndXNmxLWmdGU3hqcWxIZ3FVeWRFOWd0a0x6dDZINGgiLCJleHAiOjU0NTQ1NTY2NzcsImlhdCI6MTQ1NDUyMDY3N30._oDtTyLH1_4YPZPsxL2LT0Kcwr8GDfFoKqZKifGYG8Y"
+}
 
 const dynamoClient = DynamoDb.documentClientAsync(DYNAMO_REGION)
 
