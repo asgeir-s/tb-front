@@ -80,13 +80,13 @@ export function handle(
         context.done(null, result.data)
       }
       else {
+        const statusCode = result.statusCode ? result.statusCode : 500
         log.log("RESULT", "FAILURE: returning result", {
           "GRID": result.GRID,
           "data": result.data,
           "success": result.success,
-          "statusCode": result.statusCode
+          "statusCode": statusCode
         })
-        const statusCode = result.statusCode ? result.statusCode : 500
         context.done("[" + statusCode + "] " + result.data + ". When contacting support please provide this id: " +
           result.GRID, null)
       }
