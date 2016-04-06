@@ -5,7 +5,7 @@ import * as sinon from "sinon"
 
 import { handle } from "./handler"
 import { Context } from "./common/typings/aws-lambda"
-import { User } from "./common/typings/jwt-user"
+import { User } from "./typings/jwt-user"
 import { Responds } from "./common/typings/responds"
 import { JWT } from "./jwt"
 

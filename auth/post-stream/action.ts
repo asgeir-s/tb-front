@@ -2,8 +2,8 @@
 import * as Promise from "bluebird"
 import * as _ from "ramda"
 
-import { User } from "../../lib/common/typings/jwt-user"
-import { NewStreamRequest } from "../../lib/typings/new-stream-request"
+import { User } from "../../lib/typings/jwt-user"
+import { NewStreamRequest } from "../../lib/common/typings/new-stream-request"
 import { Responds } from "../../lib/common/typings/responds"
 import { Context } from "../../lib/common/typings/aws-lambda"
 import { JWT } from "../../lib/jwt"

@@ -2,7 +2,7 @@ import * as Promise from "bluebird"
 import * as request from "request"
 import * as _ from "ramda"
 
-import { User } from "./common/typings/jwt-user"
+import { User } from "./typings/jwt-user"
 
 const requestAsync = Promise.promisify(request)
 

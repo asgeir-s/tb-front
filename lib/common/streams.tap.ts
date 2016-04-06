@@ -3,7 +3,7 @@ import { DynamoDb, SES, SNS } from "./aws"
 import * as _ from "ramda"
 import { Streams } from "./streams"
 import * as sinon from "sinon"
-import { NewStreamRequest } from "../../lib/typings/new-stream-request"
+import { NewStreamRequest } from "../../lib/common/typings/new-stream-request"
 import { guid } from "./guid"
 
 

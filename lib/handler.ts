@@ -4,7 +4,7 @@ import * as tv4 from "tv4"
 
 import { Context } from "./common/typings/aws-lambda"
 import { JWT } from "./jwt"
-import { User } from "./common/typings/jwt-user"
+import { User } from "./typings/jwt-user"
 import { Responds } from "./common/typings/responds"
 import { log, userLog } from "./logger"
 import { validateEvent } from "./event-validator"

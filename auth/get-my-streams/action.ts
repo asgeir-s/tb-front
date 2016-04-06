@@ -2,7 +2,7 @@
 import * as _ from "ramda"
 
 import { Context } from "../../lib/common/typings/aws-lambda"
-import { User } from "../../lib/common/typings/jwt-user"
+import { User } from "../../lib/typings/jwt-user"
 import { Logger } from "../../lib/logger"
 import { Stream } from "../../lib/common/typings/stream"
 import { Responds } from "../../lib/common/typings/responds"

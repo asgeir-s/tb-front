@@ -3,7 +3,7 @@ import * as _ from "ramda"
 
 import { Context } from "../../lib/common/typings/aws-lambda"
 
-import { User } from "../../lib/common/typings/jwt-user"
+import { User } from "../../lib/typings/jwt-user"
 import { Signals } from "../../lib/common/signals"
 import { Signal } from "../../lib/common/typings/signal"
 import { Responds } from "../../lib/common/typings/responds"
