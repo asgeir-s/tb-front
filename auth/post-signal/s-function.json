@@ -26,19 +26,7 @@
       "requestTemplates": {
         "application/json": "{\"jwt\":\"$input.params('x-auth-token')\",\"streamId\": \"$util.urlDecode($input.params('streamId'))\", \"signal\": $input.json('$.signal')}"
       },
-      "responses": {
-        "400": {
-          "statusCode": "400"
-        },
-        "default": {
-          "statusCode": "200",
-          "responseParameters": {},
-          "responseModels": {},
-          "responseTemplates": {
-            "application/json": ""
-          }
-        }
-      }
+      "responses": "$${apiGatewayRespondses}"
     }
   ],
   "events": [],

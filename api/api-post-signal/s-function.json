@@ -26,22 +26,7 @@
       "requestTemplates": {
         "application/json": "{\"apiKey\":\"$input.params('x-authorization')\",\"streamId\":\"$util.urlDecode($input.params('streamId'))\",\"tradeSignal\": $input.json('$')}"
       },
-      "responses": {
-        ".*\\\"statusCode\\\":409.*": {
-          "statusCode": "409",
-          "responseTemplates": {
-            "application/json": "$input.json('$.errorMessage')"
-          }
-        },
-        "default": {
-          "statusCode": "200",
-          "responseParameters": {},
-          "responseModels": {},
-          "responseTemplates": {
-            "application/json": ""
-          }
-        }
-      }
+      "responses": "$${apiGatewayRespondses}"
     }
   ],
   "events": [],

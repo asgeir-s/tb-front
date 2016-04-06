@@ -25,19 +25,7 @@
       "requestTemplates": {
         "application/json": "{\"streamId\":\"$util.urlDecode($input.params('streamId'))\"}"
       },
-      "responses": {
-        "400": {
-          "statusCode": "400"
-        },
-        "default": {
-          "statusCode": "200",
-          "responseParameters": {},
-          "responseModels": {},
-          "responseTemplates": {
-            "application/json": ""
-          }
-        }
-      }
+      "responses": "$${apiGatewayRespondses}"
     }
   ],
   "events": [],

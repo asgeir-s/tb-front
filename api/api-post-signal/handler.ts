@@ -113,7 +113,9 @@ export function handler(event: any, context: Context) {
           "success": result.success,
           "statusCode": result.statusCode
         })
-        context.done(JSON.stringify(result), null)
+        const statusCode = result.statusCode ? result.statusCode : 500
+        context.done("[" + statusCode + "] " + result.data + ". When contacting support please provide this id: " +
+          result.GRID, null)
       }
     })
 }
