@@ -17,7 +17,7 @@ export module GetApiKey {
   export function action(inn: Inject, event: any, context: Context, user: User): Promise<Responds> {
     if (_.contains(event.streamId, user.streamIds)) {
       return inn.getApiKeyId(event.streamId)
-        .then(apiKeyId => inn.generateApiKey(user, apiKeyId, event.streamId))
+        .then(apiKeyId => inn.generateApiKey(user, event.streamId, apiKeyId))
         .then(apiKey => {
           return {
             "GRID": context.awsRequestId,
