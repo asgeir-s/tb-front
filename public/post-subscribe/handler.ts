@@ -10,6 +10,7 @@ import { Recaptcha } from "../../lib/recaptcha"
 import { log } from "../../lib/logger"
 
 const publicEndpoint = true
+
 export const eventSchema = {
   "type": "object",
   "properties": {
@@ -38,6 +39,18 @@ export const eventSchema = {
         "apiSecret": {
           "type": "string",
           "pattern": "^[a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?$"
+        },
+        "autoTraderData": {
+          "type": "object",
+          "properties": {
+            "percentToTrade": {
+              "type": "number",
+              "minimum": 0.01,
+              "maximum": 1
+            }
+          },
+          "additionalProperties": false,
+          "required": ["percentToTrade"]
         }
       },
       "additionalProperties": false,
