@@ -13,7 +13,7 @@ import { Streams } from "../../lib/common/streams"
 export module PostStream {
 
   export interface Inject {
-    checkJwtIsUpToDate: (user: User) => Promise<boolean>
+    checkJwtIsUpToDate: (userId: string, appMetadata: any) => Promise<boolean>
     postToStreamService: (grid: string, newStreamRequest: NewStreamRequest) => Promise<string> // returns streamId
     addStreamToAuth0UserReturnAppData: (userId: string, streamId: string) => Promise<any>
     updateUserJwt: (user: User, newAppMetadata: any) => string
@@ -26,7 +26,7 @@ export module PostStream {
       const newStream: NewStreamRequest = event.stream
       newStream.userId = user.user_id // dirty!
 
-      return inn.checkJwtIsUpToDate(user)
+      return inn.checkJwtIsUpToDate(user.user_id, user.app_metadata)
         .then(result => {
           if (result) {
             return inn.postToStreamService(context.awsRequestId, newStream)

@@ -2,8 +2,6 @@ import * as Promise from "bluebird"
 import * as request from "request"
 import * as _ from "ramda"
 
-import { User } from "./typings/jwt-user"
-
 const requestAsync = Promise.promisify(request)
 
 export module Auth0 {
@@ -29,10 +27,10 @@ export module Auth0 {
       })
   }
 
-  export function checkUserAppMetadataUptodate(auth0Url: string, auth0Jwt: string, user: User):
+  export function checkUserAppMetadataUptodate(auth0Url: string, auth0Jwt: string, userId: string, appMetadata: any):
     Promise<boolean> {
-    return getUserInfo(auth0Url, auth0Jwt, user.user_id, "app_metadata")
-      .then(userData => _.equals(userData.app_metadata, user.app_metadata) ? true : false)
+    return getUserInfo(auth0Url, auth0Jwt, userId, "app_metadata")
+      .then(userData => _.equals(userData.app_metadata, appMetadata) ? true : false)
   }
 
   export function addStreamToAuth0UserReturnAppData(auth0Url: string, auth0Jwt: string, userId: string,

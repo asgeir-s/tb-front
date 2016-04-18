@@ -11,7 +11,7 @@ import { DynamoDb } from "../../lib/common/aws"
 import { PostStream } from "./action"
 import { eventSchema } from "./handler"
 import { JWT } from "../../lib/jwt"
-import { Auth0 } from "../../lib/auth0"
+import { Auth0 } from "../../lib/common/auth0"
 
 const JWT_SECRET = "jwt-secret"
 const AUTH0_CLIENT_ID = "2wW6lKZgFSxjqlHgqUydE9gtkLzt6H4h"

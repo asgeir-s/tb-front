@@ -6,7 +6,7 @@ import { handle } from "../../lib/handler"
 import { Streams } from "../../lib/common/streams"
 import { DynamoDb } from "../../lib/common/aws"
 import { PostStream } from "./action"
-import { Auth0 } from "../../lib/auth0"
+import { Auth0 } from "../../lib/common/auth0"
 import { JWT } from "../../lib/jwt"
 
 
