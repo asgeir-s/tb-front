@@ -1,4 +1,4 @@
-
+import * as Promise from "bluebird"
 import * as _ from "ramda"
 
 import { Context } from "../../lib/common/typings/aws-lambda"
