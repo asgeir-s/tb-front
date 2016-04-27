@@ -31,6 +31,7 @@ export module PostStream {
           if (result) {
             return inn.postToStreamService(context.awsRequestId, newStream)
               .then(newStreamId => inn.addStreamToAuth0UserReturnAppData(user.user_id, newStreamId)
+                // todo: add subcriptions to SNS topic for stream
                 .then(newAppdata => {
                   return {
                     "GRID": context.awsRequestId,

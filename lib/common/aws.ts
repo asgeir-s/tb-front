@@ -11,24 +11,57 @@ export module DynamoDb {
     return documentClient
   }
 
-  export function load(documentclient: any, storageTable: string,
-    id: string, attributes: Array<string>): Promise<any> {
 
-    return documentclient.getAsync({
-      TableName: storageTable,
-      Key: { "id": id },
-      AttributesToGet: attributes
-    }).then((res: any) => res.Item)
-  }
-
-  export function save(documentclient: any, storageTable: string,
-    id: string, items: Array<Array<any>>): Promise<any> {
+  export function storeKeyValue(documentclient: any, storageTable: string,
+    itemId: string, keyValue: Array<Array<any>>): Promise<any> {
 
     return documentclient.putAsync({
       TableName: storageTable,
-      Item: _.reduce((obj: any, item: Array<any>) => _.assoc(item[0], item[1], obj), { "id": id }, items)
+      Item: _.reduce((obj: any, item: Array<any>) => _.assoc(item[0], item[1], obj), { "id": itemId }, keyValue)
     })
   }
+
+
+  export function addItem(documentclient: any, tableName: string, primaryKey: string, item: any):
+    Promise<any> {
+    return documentclient.putAsync({
+      "TableName": tableName,
+      "Item": item
+    })
+  }
+
+  export function addItemNoReplace(documentclient: any, tableName: string, primaryKey: string, item: any):
+    Promise<any> {
+    return documentclient.putAsync({
+      "TableName": tableName,
+      "Item": item,
+      "ConditionExpression": "attribute_not_exists(" + primaryKey + ")"
+    })
+  }
+
+  /**
+   * Returns full item
+   */
+  export function getItem(documentclient: any, tableName: string, primaryKey: any):
+    Promise<any> {
+    return documentclient.getAsync({
+      "TableName": tableName,
+      "Key": primaryKey
+    }).then((res: any) => res.Item)
+  }
+
+  /**
+   * Returns specifyed attributes
+   */
+  export function getItemWithAttrebutes(documentclient: any, tableName: string, primaryKey: any,
+    attributesToGet: Array<string>): Promise<any> {
+    return documentclient.getAsync({
+      "TableName": tableName,
+      "Key": primaryKey,
+      "AttributesToGet": attributesToGet
+    }).then((res: any) => res.Item)
+  }
+
 }
 
 export module SES {
@@ -96,38 +129,65 @@ export module SNS {
    *  lambdaArn: "arn:aws:lambda:us-west-2:525932482084:function:test-func:dev"
    *  statmentId: new Date().getTime().toString()
    *  testTopic: "arn:aws:sns:us-west-2:525932482084:test-topic"
+   * 
+   * Returns SubscriptionArn
    */
-  export function subscribeLambda(snsClient: any, lambdaClient: any, topicArn: string, lambdaArn: string,
-    statementId: string): Promise<any> {
+  export function subscribeLambda(snsClient: any, lambdaClient: any, topicArn: string, lambdaArn: string):
+    Promise<string> {
     return snsClient.subscribeAsync({
       Protocol: "lambda",
       TopicArn: topicArn,
       Endpoint: lambdaArn
     })
       .then((res: any) => {
+
+        /**
+         * makes a statementId that is maximun 100 in length
+         */
+        function createStatmentId(topicArnRaw: string, lambdaArnRaw: string) {
+          let topicArn = topicArnRaw.split(":").join("")
+          let lambdaArn = lambdaArnRaw.split(":").join("")
+
+          if (topicArn.length > 50) {
+            const start = topicArn.length - 50
+            topicArn = topicArn.substr(start, 50)
+          }
+
+          if (lambdaArn.length > 50) {
+            const start = lambdaArn.length - 50
+            lambdaArn = lambdaArn.substr(start, 50)
+          }
+
+          return topicArn + lambdaArn
+        }
         const arnParts = lambdaArn.split(":")
-        if (arnParts.length === 8) {
-          return lambdaClient.addPermissionAsync2({
-            Action: "lambda:InvokeFunction",
-            FunctionName: arnParts[6],
-            Principal: "sns.amazonaws.com",
-            StatementId: statementId,
-            Qualifier: arnParts[7]
-          })
-        }
-        else if (arnParts.length === 7) {
-          return lambdaClient.addPermissionAsync2({
-            Action: "lambda:InvokeFunction",
-            FunctionName: arnParts[6],
-            Principal: "sns.amazonaws.com",
-            StatementId: statementId
-          })
-        }
-        else {
-          return "unable to parse arn. Arn length should be 8 or 7"
+        const statementId = createStatmentId(topicArn, lambdaArn)
+
+        const prop: any = {
+          Action: "lambda:InvokeFunction",
+          FunctionName: arnParts[6],
+          Principal: "sns.amazonaws.com",
+          StatementId: statementId
         }
 
+        if (arnParts.length === 8) {
+          prop["Qualifier"] = arnParts[7]
+        }
+
+        return lambdaClient.addPermissionAsync2(prop)
+          .then((lambdaRes: any) => res.SubscriptionArn)
+          .catch((e: Error) => (e.name.indexOf("ResourceConflictException") > -1), (error: any) => {
+            console.log("The permission already exists: (ResourceConflictException). Subscription was added with " +
+              "SubscriptionArn:" + res.SubscriptionArn)
+            return res.SubscriptionArn
+          })
       })
+  }
+
+  export function unsubscribe(snsClient: any, subscriptionArn: string): Promise<any> {
+    return snsClient.unsubscribeAsync({
+      "SubscriptionArn": subscriptionArn
+    })
   }
 }
 
