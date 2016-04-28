@@ -38,8 +38,7 @@
     "STREAM_SERVICE_URL": "${serviceUrl-tbStreams}",
     "STREAM_SERVICE_APIKEY": "${serviceApiKey-tbStreams}",
     "JWT_USER_SECRET": "${jwt-user-secret}",
-    "MAX_NUMBER_OF_STREAM": "${max-number-of-streams}",
-    "SNS_SUBSCRIBE_LAMBDAS": "lambdaArn1,lambdaArn2,lambdaArn3"
+    "MAX_NUMBER_OF_STREAM": "${max-number-of-streams}"
   },
   "vpc": {
     "securityGroupIds": [],

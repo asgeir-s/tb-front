@@ -5,6 +5,7 @@ import * as _ from "ramda"
 import { User } from "../../lib/typings/jwt-user"
 import { NewStreamRequest } from "../../lib/common/typings/new-stream-request"
 import { Responds } from "../../lib/common/typings/responds"
+import { Stream } from "../../lib/common/typings/stream"
 import { Context } from "../../lib/common/typings/aws-lambda"
 import { JWT } from "../../lib/jwt"
 import { Streams } from "../../lib/common/streams"
@@ -31,7 +32,6 @@ export module PostStream {
           if (result) {
             return inn.postToStreamService(context.awsRequestId, newStream)
               .then(newStreamId => inn.addStreamToAuth0UserReturnAppData(user.user_id, newStreamId)
-                // todo: add subcriptions to SNS topic for stream
                 .then(newAppdata => {
                   return {
                     "GRID": context.awsRequestId,
