@@ -3,7 +3,8 @@
     "module": "commonjs",
     "noImplicitAny": true,
     "removeComments": true,
-    "preserveConstEnums": true
+    "preserveConstEnums": true,
+    "target": "es5"
   },
   "exclude": [
     "node_modules",
