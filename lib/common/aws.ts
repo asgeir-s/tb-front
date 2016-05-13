@@ -22,7 +22,7 @@ export module DynamoDb {
   }
 
 
-  export function addItem(documentclient: any, tableName: string, primaryKey: string, item: any):
+  export function addItem(documentclient: any, tableName: string, item: any):
     Promise<any> {
     return documentclient.putAsync({
       "TableName": tableName,

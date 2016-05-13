@@ -54,6 +54,13 @@
                 "dynamodb:UpdateItem"
               ],
               "Resource": "arn:aws:dynamodb:${region}:*:*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:PutItem"
+              ],
+              "Resource": "arn:aws:dynamodb:${region}:*:table/mirror-bitfinex"
             }
           ]
         },
