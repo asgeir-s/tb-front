@@ -29,7 +29,7 @@ export module PostMirror {
         .then(res => {
           return {
             "GRID": context.awsRequestId,
-            "data": "mirror added for stream: " + event.streamId,
+            "data": "SUCCESS: mirror added for stream with id: " + event.streamId,
             "success": true
           }
         })
