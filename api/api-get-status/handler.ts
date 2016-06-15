@@ -7,7 +7,7 @@ import { Signals } from "../../lib/common/signals"
 import { Streams } from "../../lib/common/streams"
 import { DynamoDb } from "../../lib/common/aws"
 import { JWT } from "../../lib/jwt"
-import { PostSignalApi } from "./action"
+import { GetStatusApi } from "./action"
 import { validateEvent } from "../../lib/event-validator"
 import { verify, VerifyOptions, sign, SignOptions } from "jsonwebtoken"
 import { log, userLog } from "../../lib/logger"
@@ -23,20 +23,17 @@ export const eventSchema: tv4.JsonSchema = {
     "streamId": {
       "type": "string",
       "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
-    },
-    "tradeSignal": {
-      "enum": [ 1, 0, -1, "1", "0", "-1" ]
     }
   },
   "additionalProperties": false,
-  "required": ["apiKey", "streamId", "tradeSignal"]
+  "required": ["apiKey", "streamId"]
 }
 
 const dynamoClient = DynamoDb.documentClientAsync(process.env.DYNAMO_REGION)
 
-const inn: PostSignalApi.Inject = {
+const inn: GetStatusApi.Inject = {
   getStreamPrivete: _.curry(Streams.getStream)(dynamoClient, process.env.STREAMS_TABLE, Streams.AuthLevel.Private),
-  postSignal: _.curry(Signals.postSignal)(process.env.SIGNAL_SERVICE_URL, process.env.SIGNAL_SERVICE_APIKEY)
+  getStaus: _.curry(Signals.getStatus)(process.env.SIGNAL_SERVICE_URL, process.env.SIGNAL_SERVICE_APIKEY)
 }
 
 export function handler(event: any, context: Context) {
@@ -48,8 +45,6 @@ export function handler(event: any, context: Context) {
         throw new Error("unvalide event")
       }
       else {
-        event.tradeSignal = parseInt(event.tradeSignal)
-
         // validate jwt
         const valideJwtData = verify(event.apiKey.split(" ")[1], new Buffer(process.env.JWT_API_USER_SECRET,
           "base64"), {
@@ -59,7 +54,7 @@ export function handler(event: any, context: Context) {
 
         // check event.streamId = jwt.streamId
         if (valideJwtData.streamId === event.streamId) {
-          return PostSignalApi.action(inn, event, context, valideJwtData.userId, valideJwtData.apiKeyId)
+          return GetStatusApi.action(inn, event, context, valideJwtData.userId, valideJwtData.apiKeyId)
         }
         else {
           throw new Error("streamId and apiKey does not match")

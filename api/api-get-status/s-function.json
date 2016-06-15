@@ -1,0 +1,48 @@
+{
+  "name": "api-get-status",
+  "runtime": "nodejs",
+  "description": "Serverless Lambda function for project: tb-front",
+  "customName": "tb-front_auth_api-get-status",
+  "customRole": false,
+  "handler": "api/api-get-status/handler.handler",
+  "timeout": 6,
+  "memorySize": 1024,
+  "authorizer": {},
+  "custom": {
+    "excludePatterns": []
+  },
+  "endpoints": [
+    {
+      "path": "api/streams/{streamId}/status",
+      "method": "GET",
+      "type": "AWS",
+      "authorizationType": "none",
+      "authorizerFunction": false,
+      "apiKeyRequired": false,
+      "requestParameters": {
+        "integration.request.path.integrationQueryParam": "method.request.path.streamId",
+        "integration.request.header.x-authorization": "method.request.header.x-authorization"
+      },
+      "requestTemplates": {
+        "application/json": "{\"apiKey\":\"$input.params('x-authorization')\",\"streamId\":\"$util.urlDecode($input.params('streamId'))\"}"
+      },
+      "responses": "$${apiGatewayRespondses}"
+    }
+  ],
+  "events": [],
+  "environment": {
+    "SERVERLESS_PROJECT": "${project}",
+    "SERVERLESS_STAGE": "${stage}",
+    "SERVERLESS_REGION": "${region}",
+    "SIGNAL_SERVICE_URL": "${serviceUrl-tbSignals}",
+    "SIGNAL_SERVICE_APIKEY": "${serviceApiKey-tbSignals}",
+    "DYNAMO_REGION": "${dynamo-region}",
+    "STREAMS_TABLE": "${dynamo-table-streams}",
+    "JWT_API_USER_SECRET": "${jwt-api-user-secret}",
+    "AUTH0_CLIENT_ID": "${auth0-client-id}"
+  },
+  "vpc": {
+    "securityGroupIds": [],
+    "subnetIds": []
+  }
+}
