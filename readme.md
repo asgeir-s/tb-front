@@ -28,22 +28,22 @@ TradersBit will also host trading competitions. For instance, most profitable st
 
 ## API
 Publicly available
-  * GET: /streams/{streamId} - get statistics for a stream
-  * GET: /streams/{streamId}/signals - get all signals in a stream, except any currently open position
-  * GET: /streams - statistics for all streams
-  * POST: /subscribe - subscribe to a stream (returns payment URL etc.)
+  * **GET: /streams/{streamId}** - get statistics for a stream
+  * **GET: /streams/{streamId}/signals** - get all signals in a stream, except any currently open position
+  * **GET: /streams** - statistics for all streams
+  * **POST: /subscribe** - subscribe to a stream (returns payment URL etc.)
 
 Accessible after sign in on webpage
-  * GET: /me/streams/{streamId}/apikey - generate an API key for this stream
-  * GET: /me/streams - returns the users streams
-  * POST: /me/streams/{streamId}/mirror - post API-keys for Bitfinex so that your trades can be copied to this stream
-  * POST: /me/streams/{streamId}/signal - publish a signal to one of my streams
-  * POST: /me/streams - create a new stream
-  * PUT: /me/streams/{streamId}/subscription-price - change the price for subscribing to one of my streams
+  * **GET: /me/streams/{streamId}/apikey** - generate an API key for this stream
+  * **GET: /me/streams** - returns the users streams
+  * **POST: /me/streams/{streamId}/mirror** - post API-keys for Bitfinex so that your trades can be copied to this stream
+  * **POST: /me/streams/{streamId}/signal** - publish a signal to one of my streams
+  * **POST: /me/streams** - create a new stream
+  * **PUT: /me/streams/{streamId}/subscription-price** - change the price for subscribing to one of my streams
 
 Accessed with an API-key (from GET: /me/streams/{streamId}/apikey)
-  * GET: /api/streams/{streamId}/status - customer API for getting a streams status
-  * POST: /api/streams/{streamId}/signal - customer API for posting a new trading signal
+  * **GET: /api/streams/{streamId}/status** - customer API for getting a streams status
+  * **POST: /api/streams/{streamId}/signal** - customer API for posting a new trading signal
 
 ## Testing
 Currently AWS Lambda runs on Node.js: v0.10.36. Therfore, it must be tested on that version of node:
