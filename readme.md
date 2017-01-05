@@ -1,4 +1,3 @@
-
 Serverless API-functions for TradersBit. TradersBit is shut down and open sourced.
 
 This project contains serverless (AWS Lambda) functions that are accessible as an API through AWS API Gateway. This is the API used by the [tradersbit webpage](https://github.com/sogasg/tradersbit.com). It is using the [Serverless framework](https://github.com/serverless/serverless).
